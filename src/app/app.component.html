@@ -1,0 +1,16 @@
+<div *ngFor="let numb of [1,2,3]" class="background img{{numb}}" [ngClass]="{'active': activeBackground === numb}">
+</div>
+
+<div class="menu-wrapper">
+    <div class="menu-design-element"></div>
+    <div class="menu-items-wrapper">
+        <a *ngFor="let item of menuItems" class="menu-item menu-item-{{item.numb}}" (click)="menuItemClicked(item)">
+            <div class="menu-item{{item.numb}}-background"></div>
+            <span>{{item.text}}</span>
+        </a>
+    </div>
+    <div *ngFor="let numb of [1,2,3]">
+        <button (click)="changeBackground(numb)">Change background {{numb}}</button>
+        <br>
+    </div>
+</div>

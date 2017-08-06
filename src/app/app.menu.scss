@@ -1,0 +1,137 @@
+.background {
+    height: 100%;
+    left: 0;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    transition: .5s linear;
+    width: 100%;
+    z-index: -9999;
+}
+.background.active {
+    opacity: 1;
+}
+
+.background.img1 {
+    background: url(../assets/Фон_НЕпрозрачный_кусок.png) 10px 0 repeat;
+    background-size: 300px;
+}
+
+.background.img2 {
+    background: url(../assets/Фон2_тест.png) -10px 10px repeat;
+    background-size: 300px;
+}
+
+.background.img3 {
+    background: url(../assets/Фон3_тест.png) -200px 140px repeat;
+    background-size: 300px;
+}
+
+
+/* Header */
+.header-design-element {
+
+}
+
+
+/* Menu */
+$menu-design-element-width: 120px;
+$menu-design-element-height: 560px;
+.menu-design-element {
+    background: url(../assets/Меню_элемент-оформления_полный-размер.png) 0 0 no-repeat;
+    background-position: 0 center;
+    background-size: contain;
+    height: 120%;
+    min-height: $menu-design-element-height;
+    min-width: $menu-design-element-width;
+    pointer-events: none;
+    position: fixed;
+    //top: calc(50% - #{$menu-design-element-height / 2 - 10});
+    top: 54%;
+    transform: translateY(-51%) translateX(-20%);
+    width: 13%;
+    z-index: 2;
+}
+
+/* Items */
+.menu-items-wrapper {
+    z-index: 1;
+
+    span {
+        color: black;
+        font-family: MyriadPro-BoldCond;
+        font-size: 31px;
+        position: absolute;
+        right: 24px;
+        text-decoration: none;
+        top: 2px;
+    }
+
+    // Common things of '.menu-item-{{numb}}'
+    .menu-item {
+        cursor: pointer;
+        display: block;
+        filter: drop-shadow(5px 0 18px rgba(0,0,0,0.18));
+        height: 50px;
+        margin-left: -100px;
+        margin-top: 10px;
+        position: relative;
+    }
+    .menu-item:first-child {
+        margin-top: 110px;
+    }
+
+    .menu-item-1 {
+        background: url(../assets/Меню_пункт-1_задник_без-тени.png) 0 0 no-repeat;
+        width: 340px;
+    }
+    .menu-item-2 {
+        background: url(../assets/Меню_пункт-2_задник_без-тени.png) 0 0 no-repeat;
+        transform: translateX(11px);
+        width: 350px;
+
+        span {
+            right: 25px;
+        }
+    }
+    .menu-item-3 {
+        background: url(../assets/Меню_пункт-3_задник_без-тени.png) 0 0 no-repeat;
+        margin-top: 40px;
+        transform: translateX(41px);
+        width: 410px;
+
+        span {
+            font-size: 33px;
+        }
+    }
+    .menu-item-4 {
+        background: url(../assets/Меню_пункт-4_задник_без-тени.png) 0 0 no-repeat;
+        width: 396px;
+    }
+    .menu-item-5 {
+        background: url(../assets/Меню_пункт-5_задник_без-тени.png) 0 0 no-repeat;
+        height: 55px;
+        transform: translateX(54px);
+        width: 550px;
+
+        span {
+            font-size: 24px;
+            top: 6px;
+        }
+    }
+    .menu-item-6 {
+        background: url(../assets/Меню_пункт-6_задник_без-тени.png) 0 0 no-repeat;
+        transform: translateX(49px);
+        width: 460px;
+
+        span {
+            top: 3px;
+        }
+    }
+
+    .menu-item {
+        // This style need to be after 'background'. Else it will not work
+        // Thats why it dublicates
+        background-size: 100%;
+    }
+}

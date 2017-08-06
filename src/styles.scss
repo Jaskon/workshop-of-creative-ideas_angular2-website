@@ -1,0 +1,12 @@
+/* Global styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+// Custom font (used in menu items)
+@font-face {
+    font-family: 'MyriadPro-BoldCond';        // Name of the font
+    src: url('assets/MyriadPro-BoldCond.otf');
+}
