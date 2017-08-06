@@ -1,6 +1,13 @@
+<!-- Background(s) -->
 <div *ngFor="let numb of [1,2,3]" class="background img{{numb}}" [ngClass]="{'active': activeBackground === numb}">
 </div>
 
+<!-- Header -->
+<div class="header-wrapper">
+    <div class="header-design-element"></div>
+</div>
+
+<!-- Menu -->
 <div class="menu-wrapper">
     <div class="menu-design-element"></div>
     <div class="menu-items-wrapper">
@@ -13,4 +20,9 @@
         <button (click)="changeBackground(numb)">Change background {{numb}}</button>
         <br>
     </div>
+</div>
+
+<!-- Footer -->
+<div class="footer-wrapper">
+    <div class="footer-design-element"></div>
 </div>

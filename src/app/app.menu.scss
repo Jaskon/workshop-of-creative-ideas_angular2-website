@@ -1,39 +1,3 @@
-.background {
-    height: 100%;
-    left: 0;
-    opacity: 0;
-    position: fixed;
-    top: 0;
-    transition: .5s linear;
-    width: 100%;
-    z-index: -9999;
-}
-.background.active {
-    opacity: 1;
-}
-
-.background.img1 {
-    background: url(../assets/Фон_НЕпрозрачный_кусок.png) 10px 0 repeat;
-    background-size: 300px;
-}
-
-.background.img2 {
-    background: url(../assets/Фон2_тест.png) -10px 10px repeat;
-    background-size: 300px;
-}
-
-.background.img3 {
-    background: url(../assets/Фон3_тест.png) -200px 140px repeat;
-    background-size: 300px;
-}
-
-
-/* Header */
-.header-design-element {
-
-}
-
-
 /* Menu */
 $menu-design-element-width: 120px;
 $menu-design-element-height: 560px;
@@ -55,6 +19,9 @@ $menu-design-element-height: 560px;
 
 /* Items */
 .menu-items-wrapper {
+    position: absolute;
+    left: 0;
+    top: 100px;
     z-index: 1;
 
     span {
@@ -76,9 +43,6 @@ $menu-design-element-height: 560px;
         margin-left: -100px;
         margin-top: 10px;
         position: relative;
-    }
-    .menu-item:first-child {
-        margin-top: 110px;
     }
 
     .menu-item-1 {

@@ -5,6 +5,10 @@
     padding: 0;
 }
 
+body {
+    overflow-y: scroll;
+}
+
 // Custom font (used in menu items)
 @font-face {
     font-family: 'MyriadPro-BoldCond';        // Name of the font
