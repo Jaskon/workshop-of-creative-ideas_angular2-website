@@ -1,10 +1,12 @@
+@import '../styles-variables.scss';
+
 .background {
     height: 100%;
     left: 0;
     opacity: 0;
     position: fixed;
     top: 0;
-    transition: .5s linear;
+    transition: $theme-transition;
     width: 100%;
     z-index: -9999;
 }
@@ -30,31 +32,79 @@
 
 /* Header */
 .header-wrapper {
-    position: absolute;
-    height: 300px;
+    height: 350px;
     left: 50%;
+    max-width: 1400px;
     min-width: 1000px;
-    top: 0;
-    transform: translateX(-50%) translateY(-20%);
-    width: 80%;
+    position: absolute;
+    top: -2%;
+    transform: translateX(-45%) translateY(-10%);
+    width: 83%;
+    z-index: 11;
 
     .header-design-element {
         background: url(../assets/Шапка_элем-оформления_задник_полный-размер.png) 0 0 no-repeat;
         background-size: 100%;
-        height: 300px;
+        height: 350px;
+        transition: $theme-transition;
         width: 100%;
+        z-index: -9998;
     }
+    .header-design-element.background1 {
+        filter: hue-rotate(0);
+    }
+    .header-design-element.background2 {
+        filter: hue-rotate(100deg);
+    }
+    .header-design-element.background3 {
+        filter: hue-rotate(-100deg);
+    }
+
+    .header-logo {
+        background: url(../assets/Лого.png) 0 0 no-repeat;
+        background-size: 100%;
+        height: 170px;
+        position: absolute;
+        right: 0;
+        top: 70px;
+        width: 170px;
+    }
+}
+
+
+/* Content */
+.content-component {
+    box-sizing: content-box;
+    background-color: rgba(255,255,255, .33);
+    display: block;
+    font-size: 16pt;
+    //position: absolute;
+    margin-left: 550px;
+    margin-right: 3%;
+    margin-top: 100px;
+    max-width: 640px;
+    padding: 10px 20px;
+    position: relative;
+    z-index: 10;
 }
 
 
 /* Footer */
 .footer-wrapper {
+    bottom: 0;
+    height: 350px;
+    left: 50%;
+    max-width: 1400px;
+    min-width: 1000px;
     position: absolute;
+    transform: translateX(-50%) translateY(0);
+    width: 74%;
 
     .footer-design-element {
-        background: url(../assets/Подвал_задник_полный-размер.png) 0 0 no-repeat;
+        background: url(../assets/Подвал_задник_как-есть.png) 0 bottom no-repeat;
         background-size: 100%;
-        height: 100%;
+        height: 350px;
+        transition: $theme-transition;
         width: 100%;
     }
 }

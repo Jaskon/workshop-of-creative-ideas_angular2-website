@@ -5,8 +5,16 @@
     padding: 0;
 }
 
+html {
+    height: 100%;
+}
+
 body {
+    min-height: 100%;
+    overflow-x: hidden;
     overflow-y: scroll;
+    padding-bottom: 240px;      // Depends on footer height (app/app.component.scss)
+    position: relative;
 }
 
 // Custom font (used in menu items)
