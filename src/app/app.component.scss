@@ -69,10 +69,12 @@
     z-index: 11;
 
     @media all and (min-width: $screen-width-2) {
+        height: 490px;
         width: 1400px;
     }
 
     @media all and (max-width: $screen-width-1) {
+        height: 224px;
         left: calc(50% - 40px);
         top: 0;
         width: 640px;
@@ -97,12 +99,21 @@
     }
 
     .header-title {
+        bottom: 70%;
         font-family: MyriadPro-BoldCond;
         font-size: 36px;
         right: 20%;
         pointer-events: auto;
         position: absolute;
-        top: 17%;
+        //top: 17%;
+
+        @media all and (min-width: $screen-width-2) {
+            font-size: 52px;
+        }
+
+        @media all and (max-width: $screen-width-1) {
+            font-size: 23px;
+        }
 
         &.header-title-1 {
             display: none;
@@ -271,9 +282,23 @@
     .footer-updates-wrapper {
         bottom: 20px;
         font-family: MyriadPro-BoldCond;
+        height: 70px;
         pointer-events: auto;
         position: absolute;
         right: 60%;
+        width: 230px;
+
+        @media all and (min-width: $screen-width-2) {
+            bottom: 40px;
+            right: 63%;
+            transform: scale(1.4);
+        }
+
+        @media all and (max-width: $screen-width-1) {
+            bottom: 0;
+            right: 55%;
+            transform: scale(0.6);
+        }
 
         .footer-updates-title-wrapper {
             background: url(../assets/Подвал_обновления_тайтл-задник.png) 0 0 no-repeat;
