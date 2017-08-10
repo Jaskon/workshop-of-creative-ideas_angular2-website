@@ -42,7 +42,7 @@ exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-b
 
 
 // module
-exports.push([module.i, "/* Global styles */\n* {\n  box-sizing: border-box;\n  margin: 0;\n  padding: 0; }\n\nhtml {\n  height: 100%; }\n\nbody {\n  min-height: 100%;\n  overflow-x: hidden;\n  overflow-y: scroll;\n  padding-bottom: 240px;\n  position: relative; }\n\n@font-face {\n  font-family: 'MyriadPro-BoldCond';\n  src: url(" + __webpack_require__("../../../../../src/assets/MyriadPro-BoldCond.otf") + "); }\n", ""]);
+exports.push([module.i, "/* Global styles */\n* {\n  box-sizing: border-box;\n  margin: 0;\n  padding: 0; }\n\nhtml {\n  height: 100%; }\n\nbody {\n  min-height: 100%;\n  overflow-x: hidden;\n  overflow-y: scroll;\n  padding-bottom: 240px;\n  position: relative; }\n  @media all and (min-width: 1500px) {\n    body {\n      padding-bottom: 300px; } }\n  @media all and (max-width: 1000px) {\n    body {\n      padding-bottom: 160px; } }\n\n@font-face {\n  font-family: 'MyriadPro-BoldCond';\n  src: url(" + __webpack_require__("../../../../../src/assets/MyriadPro-BoldCond.otf") + "); }\n", ""]);
 
 // exports
 

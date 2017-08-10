@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { GlobalObject } from 'app/Globals/GlobalObject';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['/app.menu.scss', './app.component.scss']
 })
-export class AppComponent {
-    activeBackground = 1;
+export class AppComponent implements OnInit {
+    activeBackground: number = 1;
+    menuOpened: boolean = false;
 
     menuItems = [
         { numb: 1, text: 'Афиша', link: '', background: 1},
@@ -16,6 +18,15 @@ export class AppComponent {
         { numb: 5, text: 'Детская студия эстетического развития', link: '', background: 2},
         { numb: 6, text: 'Хореография для всех', link: '', background: 3}
     ];
+
+    ngOnInit()  {
+        window.onload = () => { GlobalObject.FontResize(); };
+        window.onresize = () => { GlobalObject.FontResize(); };
+    }
+
+    openMenu() {
+        this.menuOpened = !this.menuOpened;
+    }
 
     menuItemClicked(menuItem) {
         this.activeBackground = menuItem.background;

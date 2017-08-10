@@ -1,5 +1,32 @@
 @import '../styles-variables.scss';
 
+/* SIZES */
+// w < 1001px        // mobiles and very small screens (hidden menu that opens with swipe, smaller header, footer, content)
+// w > 1000px && w < 1501px      // normal sizes: PCs and most of tablets (normal sizes of header, footer and content)
+// w > 1500px       // very big screens, especially with 4k monitors (content is a little below and bigger then normal; menu, footer and header are bigger)
+/* SIZES */
+
+/* 
+    FIRST ALWAYS
+    media (min-width: $screen-width-2) IS FOR BIG SCREENS
+    (= 4k screens)
+
+    SECOND ALWAYS
+    media (max-width: $screen-width-1) IS FOR SMALL SCREENS
+    (= mobiles)
+
+
+    COPY FROM HERE
+
+    @media all and (min-width: $screen-width-2) {
+        
+    }
+
+    @media all and (max-width: $screen-width-1) {
+        
+    }
+ */
+
 .background {
     height: 100%;
     left: 0;
@@ -34,13 +61,22 @@
 .header-wrapper {
     height: 350px;
     left: 50%;
-    max-width: 1400px;
-    min-width: 1000px;
+    pointer-events: none;       // ??
     position: absolute;
     top: -2%;
     transform: translateX(-45%) translateY(-10%);
-    width: 83%;
+    width: 1000px;
     z-index: 11;
+
+    @media all and (min-width: $screen-width-2) {
+        width: 1400px;
+    }
+
+    @media all and (max-width: $screen-width-1) {
+        left: calc(50% - 40px);
+        top: 0;
+        width: 640px;
+    }
 
     .header-design-element {
         background: url(../assets/Шапка_элем-оформления_задник_полный-размер.png) 0 0 no-repeat;
@@ -60,14 +96,62 @@
         filter: hue-rotate(-100deg);
     }
 
+    .header-title {
+        font-family: MyriadPro-BoldCond;
+        font-size: 36px;
+        right: 20%;
+        pointer-events: auto;
+        position: absolute;
+        top: 17%;
+
+        &.header-title-1 {
+            display: none;
+        }
+
+        &.header-title-2 {
+            display: none;
+        }
+
+        &.header-title-3 {
+            display: none;
+        }
+
+        &.header-title-4 {
+            display: none;
+        }
+
+        &.header-title-5 {
+            display: none;
+        }
+
+        &.header-title-6 {
+            background: url(../assets/Хедер_тайтл-6_задник.png) 0 0 no-repeat;
+            background-size: 100% 100%;
+        }
+    }
+
     .header-logo {
         background: url(../assets/Лого.png) 0 0 no-repeat;
         background-size: 100%;
         height: 170px;
+        pointer-events: auto;
         position: absolute;
         right: 0;
-        top: 70px;
+        top: 50px;
         width: 170px;
+
+        @media all and (min-width: $screen-width-2) {
+            height: 240px;
+            top: 70px;
+            width: 240px;
+        }
+
+        @media all and (max-width: $screen-width-1) {
+            height: 120px;
+            right: -10px;
+            top: 30px;
+            width: 120px;
+        }
     }
 }
 
@@ -77,15 +161,38 @@
     box-sizing: content-box;
     background-color: rgba(255,255,255, .33);
     display: block;
-    font-size: 18px;
+    font-size: 24px;
     //position: absolute;
     margin-left: 550px;
     margin-right: 3%;
-    margin-top: 100px;
+    margin-top: 150px;
     max-width: 640px;
     padding: 10px 20px;
+    pointer-events: auto;
     position: relative;
-    z-index: 10;
+    transition: z-index 1s;
+    z-index: 1;
+
+    &.menu-opened {
+        @media all and (max-width: $screen-width-1) {
+            // Чтобы контент был ниже меню во время его открытия в мобильном режиме
+            transition: none;
+            z-index: -1;
+        }
+    }
+
+    @media all and (min-width: $screen-width-2) {
+        margin-left: 700px;
+        margin-right: 6%;
+        margin-top: 250px;
+        max-width: none;
+    }
+
+    @media all and (max-width: $screen-width-1) {
+        margin-left: 140px;
+        margin-top: 120px;
+        max-width: none;
+    }
 }
 
 
@@ -94,11 +201,19 @@
     bottom: 0;
     height: 350px;
     left: 50%;
-    max-width: 1400px;
-    min-width: 1000px;
+    pointer-events: none;       // ??
     position: absolute;
     transform: translateX(-50%) translateY(0);
-    width: 74%;
+    width: 1000px;
+    z-index: 12;
+
+    @media all and (min-width: $screen-width-2) {
+        width: 1400px;
+    }
+
+    @media all and (max-width: $screen-width-1) {
+        width: 640px;
+    }
 
     .footer-design-element {
         background: url(../assets/Подвал_задник_как-есть.png) 0 bottom no-repeat;
@@ -106,5 +221,99 @@
         height: 350px;
         transition: $theme-transition;
         width: 100%;
+    }
+
+    .footer-description {
+        bottom: 100px;
+        color: rgb(153, 125, 97);
+        font-family: MyriadPro-BoldCond;
+        font-size: 40px;
+        height: 46px;
+        //left: 150px;
+        pointer-events: auto;
+        position: absolute;
+        right: 50%;
+        transform: translateX(-9%);
+        //width: 334px;
+        width: 33%;
+
+        @media all and (min-width: $screen-width-2) {
+            bottom: 140px;
+            height: 70px;
+        }
+
+        @media all and (max-width: $screen-width-1) {
+            bottom: 60px;
+            height: 32px;
+        }
+    }
+
+    .footer-contacts-wrapper {
+        bottom: 20px;
+        font-family: MyriadPro-BoldCond;
+        height: 127px;
+        pointer-events: auto;
+        position: absolute;
+        right: 35.2%;
+        text-align: right;
+        width: 11.8%;
+        transform: scaleX(1.24);
+
+        @media all and (min-width: $screen-width-2) {
+            height: 190px;
+        }
+
+        @media all and (max-width: $screen-width-1) {
+            height: 72px;
+        }
+    }
+
+    .footer-updates-wrapper {
+        bottom: 20px;
+        font-family: MyriadPro-BoldCond;
+        pointer-events: auto;
+        position: absolute;
+        right: 60%;
+
+        .footer-updates-title-wrapper {
+            background: url(../assets/Подвал_обновления_тайтл-задник.png) 0 0 no-repeat;
+            background-size: 100% 100%;
+            font-size: 20px;
+            margin-bottom: 8px;
+            text-align: left;
+            transform: scaleX(1.0);
+        }
+
+        .footer-updates-input-email {
+            width: 82%;
+        }
+
+        .footer-updates-input-name {
+
+        }
+
+        .footer-updates-ok-wrapper {
+            background: url(../assets/Подвал_обновления_ок-задник.png) 0 0 no-repeat;
+            background-size: 100% 100%;
+            display: inline;
+        }
+    }
+
+    .footer-map-wrapper {
+        border: 2px solid black;
+        bottom: 20px;
+        height: 170px;
+        pointer-events: auto;
+        position: absolute;
+        right: 8.8%;
+        width: 24%;
+
+        @media all and (min-width: $screen-width-2) {
+            height: 240px;
+        }
+
+        @media all and (max-width: $screen-width-1) {
+            height: 108px;
+        }
     }
 }
