@@ -11,13 +11,9 @@
     <div class="header-design-element background{{activeBackground}}"></div>
     <div class="header-logo"></div>
     <!-- Titles -->
-    <div *ngFor="let title of [
-                {numb: 1, text: 'Афиша'},{numb: 2, text: 'Проекты'},
-                {numb: 3, text: 'Fools funny crew'}, {numb: 4, text: 'Теплообмен'},
-                {numb: 5, text: 'Детская студия эстетического развития'}, {numb: 6, text: 'Хореография для всех'}
-            ]"
-            class="header-title header-title-{{title.numb}}">
-        &nbsp;&nbsp;&nbsp;{{title.text}}&nbsp;&nbsp;&nbsp;&nbsp;
+    <div *ngFor="let title of headerTitles"
+            class="header-title header-title-{{title.numb}} global-font-resize">
+        &nbsp;&nbsp;&nbsp;{{title.text}}&nbsp;&nbsp;&nbsp;
     </div>
 </div>
 
@@ -25,7 +21,8 @@
 <div class="menu-wrapper">
     <div class="menu-design-element" (click)="openMenu()"></div>
     <div class="menu-items-wrapper">
-        <a *ngFor="let item of menuItems" class="menu-item menu-item-{{item.numb}}" [ngClass]="{'menu-opened': menuOpened}" (click)="menuItemClicked(item)">
+        <a *ngFor="let item of menuItems" class="menu-item menu-item-{{item.numb}}" [ngClass]="{'menu-opened': menuOpened}"
+                [routerLink]="['/' + item.link]"> <!-- (click)="menuItemClicked(item)" -->
             <div class="menu-item-background menu-item{{item.numb}}-background"></div>
             <span id="item-span{{item.numb}}">{{item.text}}</span>
         </a>
@@ -33,7 +30,10 @@
 </div>
 
 <!-- Content -->
-<content class="content-component" [ngClass]="{'menu-opened': menuOpened}"></content>
+<!-- <content class="content-component" [ngClass]="{'menu-opened': menuOpened}"></content> -->
+<div class="content-component" [ngClass]="{'menu-opened': menuOpened}">
+    <router-outlet></router-outlet>
+</div>
 
 <!-- Footer -->
 <div class="footer-wrapper">
@@ -43,9 +43,9 @@
     </div>
     <div class="footer-updates-wrapper">
         <div class="footer-updates-title-wrapper">&nbsp;&nbsp;Подписаться на обновления &nbsp;&nbsp;&nbsp;&nbsp;</div>
-        E-mail&nbsp; <input type="email" class="footer-updates-input-email"> <br>
-        Имя&nbsp; <input type="text" class="footer-updates-input-name">
-        <div class="footer-updates-ok-wrapper">&nbsp;Оk&nbsp;&nbsp;&nbsp;</div>
+        E-mail&nbsp; <input type="email" class="footer-updates-input-email" #emailInput> <br>
+        Имя&nbsp; <input type="text" class="footer-updates-input-name" #nameInput>
+        <div class="footer-updates-ok-wrapper" (click)="subscribe(emailInput.value, nameInput.value)">&nbsp;Оk&nbsp;&nbsp;&nbsp;</div>
     </div>
     <div class="footer-contacts-wrapper global-font-resize">
         <span style="color: green">Контакты:</span> <br>

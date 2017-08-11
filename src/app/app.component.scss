@@ -63,20 +63,21 @@
     left: 50%;
     pointer-events: none;       // ??
     position: absolute;
-    top: -2%;
+    top: -12px;
     transform: translateX(-45%) translateY(-10%);
     width: 1000px;
     z-index: 11;
 
     @media all and (min-width: $screen-width-2) {
         height: 490px;
+        top: -18px;
         width: 1400px;
     }
 
     @media all and (max-width: $screen-width-1) {
         height: 224px;
         left: calc(50% - 40px);
-        top: 0;
+        top: -6px;
         width: 640px;
     }
 
@@ -102,10 +103,12 @@
         bottom: 70%;
         font-family: MyriadPro-BoldCond;
         font-size: 36px;
+        height: 13%;
         right: 20%;
         pointer-events: auto;
         position: absolute;
-        //top: 17%;
+        text-align: center;
+        width: 36%;
 
         @media all and (min-width: $screen-width-2) {
             font-size: 52px;
@@ -116,23 +119,42 @@
         }
 
         &.header-title-1 {
-            display: none;
+            background: url(../assets/Хедер_тайтл-1_задник.png) 0 0 no-repeat;
+            background-size: 100% 100%;
+            height: 13%;
+            right: 27%;
+            width: 21%;
         }
 
         &.header-title-2 {
-            display: none;
+            background: url(../assets/Хедер_тайтл-2_задник.png) 0 0 no-repeat;
+            background-size: 100% 100%;
+            height: 13%;
+            right: 26%;
+            width: 24%;
         }
 
         &.header-title-3 {
-            display: none;
+            background: url(../assets/Хедер_тайтл-3_задник.png) 0 0 no-repeat;
+            background-size: 100% 100%;
         }
 
         &.header-title-4 {
-            display: none;
+            background: url(../assets/Хедер_тайтл-4_задник.png) 0 0 no-repeat;
+            background-size: 100% 100%;
+            bottom: 69%;
+            height: 14%;
+            right: 26%;
+            width: 24%;
         }
 
         &.header-title-5 {
-            display: none;
+            background: url(../assets/Хедер_тайтл-5_задник.png) 0 0 no-repeat;
+            background-size: 100% 100%;
+            bottom: 71%;
+            height: 10%;
+            right: 19%;
+            width: 38%;
         }
 
         &.header-title-6 {
@@ -173,7 +195,6 @@
     background-color: rgba(255,255,255, .33);
     display: block;
     font-size: 24px;
-    //position: absolute;
     margin-left: 550px;
     margin-right: 3%;
     margin-top: 150px;
