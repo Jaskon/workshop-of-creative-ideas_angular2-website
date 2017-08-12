@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { Router, NavigationEnd } from '@angular/router';
 import { GlobalObject } from 'app/Globals/GlobalObject';
 
@@ -25,12 +26,12 @@ export class AppComponent implements OnInit {
 
     // This one changes when clicking on the menu item
     headerTitles = [
-        { numb: 1, text: 'Афиша' },
-        { numb: 2, text: 'Проекты' },
-        { numb: 3, text: 'Fools funny crew' },
-        { numb: 4, text: 'Теплообмен' },
-        { numb: 5, text: 'Детская студия эстетического развития' },
-        { numb: 6, text: 'Хореография для всех' }
+        { numb: 1, text: 'Афиша', state: 0 },
+        { numb: 2, text: 'Проекты', state: 1 },
+        { numb: 3, text: 'Fools funny crew', state: 2 },
+        { numb: 4, text: 'Теплообмен', state: 3 },
+        { numb: 5, text: 'Детская студия эстетического развития', state: 4 },
+        { numb: 6, text: 'Хореография для всех', state: 5 }
     ];
 
     constructor(private router: Router) { 
