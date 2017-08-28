@@ -1,8 +1,0 @@
-<div *ngFor="let affiche of affiches" class="affiches-preview-wrapper-wrap">
-    <div class="affiches-preview-wrapper" [routerLink]="['/affiche/' + affiche.link]">
-        <img src="{{ affiche.img }}" class="affiches-preview-img">
-        <div class="affiches-preview-title">{{ affiche.title }}</div>
-        <div class="affiches-preview-description">{{ affiche.description }}</div>
-    </div>
-    <div class="hr"></div>
-</div>
