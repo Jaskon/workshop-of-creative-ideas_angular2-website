@@ -129,6 +129,10 @@ var NgbAccordion = (function () {
          */
         this.activeIds = [];
         /**
+         * Whether the closed panels should be hidden without destroying them
+         */
+        this.destroyOnHide = true;
+        /**
          * A panel change event fired right before the panel toggle happens. See NgbPanelChangeEvent for payload details
          */
         this.panelChange = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["EventEmitter"]();
@@ -199,7 +203,7 @@ NgbAccordion.decorators = [
                 selector: 'ngb-accordion',
                 exportAs: 'ngbAccordion',
                 host: { 'role': 'tablist', '[attr.aria-multiselectable]': '!closeOtherPanels' },
-                template: "\n  <div class=\"card\">\n    <ng-template ngFor let-panel [ngForOf]=\"panels\">\n      <div role=\"tab\" id=\"{{panel.id}}-header\"\n        [class]=\"'card-header ' + (panel.type ? 'card-'+panel.type: type ? 'card-'+type : '')\" [class.active]=\"isOpen(panel.id)\">\n        <a href (click)=\"!!toggle(panel.id)\" [class.text-muted]=\"panel.disabled\" [attr.tabindex]=\"(panel.disabled ? '-1' : null)\"\n          [attr.aria-expanded]=\"isOpen(panel.id)\" [attr.aria-controls]=\"(isOpen(panel.id) ? panel.id : null)\"\n          [attr.aria-disabled]=\"panel.disabled\">\n          {{panel.title}}<ng-template [ngTemplateOutlet]=\"panel.titleTpl?.templateRef\"></ng-template>\n        </a>\n      </div>\n      <div id=\"{{panel.id}}\" role=\"tabpanel\" [attr.aria-labelledby]=\"panel.id + '-header'\" class=\"card-body\" *ngIf=\"isOpen(panel.id)\">\n        <ng-template [ngTemplateOutlet]=\"panel.contentTpl.templateRef\"></ng-template>\n      </div>\n    </ng-template>\n  </div>\n"
+                template: "\n    <ng-template ngFor let-panel [ngForOf]=\"panels\">\n      <div class=\"card\">\n        <div role=\"tab\" id=\"{{panel.id}}-header\"\n          [class]=\"'card-header ' + (panel.type ? 'card-'+panel.type: type ? 'card-'+type : '')\" [class.active]=\"isOpen(panel.id)\">\n          <a href (click)=\"!!toggle(panel.id)\" [class.text-muted]=\"panel.disabled\" [attr.tabindex]=\"(panel.disabled ? '-1' : null)\"\n            [attr.aria-expanded]=\"isOpen(panel.id)\" [attr.aria-controls]=\"(isOpen(panel.id) ? panel.id : null)\"\n            [attr.aria-disabled]=\"panel.disabled\">\n            {{panel.title}}<ng-template [ngTemplateOutlet]=\"panel.titleTpl?.templateRef\"></ng-template>\n          </a>\n        </div>\n        <div id=\"{{panel.id}}\" role=\"tabpanel\" [attr.aria-labelledby]=\"panel.id + '-header'\" \n             class=\"card-body {{isOpen(panel.id) ? 'show' : null}}\" *ngIf=\"!destroyOnHide || isOpen(panel.id)\">\n             <ng-template [ngTemplateOutlet]=\"panel.contentTpl.templateRef\"></ng-template>\n        </div>\n      </div>\n    </ng-template>\n  "
             },] },
 ];
 /** @nocollapse */
@@ -210,6 +214,7 @@ NgbAccordion.propDecorators = {
     'panels': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["ContentChildren"], args: [NgbPanel,] },],
     'activeIds': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     'closeOtherPanels': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"], args: ['closeOthers',] },],
+    'destroyOnHide': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     'type': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     'panelChange': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Output"] },],
 };
@@ -2787,8 +2792,8 @@ var NgbDate = (function () {
  */
 var NgbDropdownConfig = (function () {
     function NgbDropdownConfig() {
-        this.up = false;
         this.autoClose = true;
+        this.placement = 'bottom-left';
     }
     return NgbDropdownConfig;
 }());
@@ -2808,9 +2813,11 @@ NgbDropdownConfig.ctorParameters = function () { return []; };
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dropdown_config__ = __webpack_require__("../../../../@ng-bootstrap/ng-bootstrap/dropdown/dropdown-config.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_positioning__ = __webpack_require__("../../../../@ng-bootstrap/ng-bootstrap/util/positioning.js");
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return NgbDropdownMenu; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return NgbDropdownToggle; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return NgbDropdown; });
+
 
 
 /**
@@ -2822,6 +2829,7 @@ var NgbDropdownMenu = (function () {
         this.isOpen = false;
     }
     NgbDropdownMenu.prototype.isEventFrom = function ($event) { return this._elementRef.nativeElement.contains($event.target); };
+    NgbDropdownMenu.prototype.position = function (triggerEl, placement) { __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__util_positioning__["a" /* positionElements */])(triggerEl, this._elementRef.nativeElement, placement); };
     return NgbDropdownMenu;
 }());
 
@@ -2840,6 +2848,7 @@ var NgbDropdownToggle = (function () {
     function NgbDropdownToggle(dropdown, _elementRef) {
         this.dropdown = dropdown;
         this._elementRef = _elementRef;
+        this.anchorEl = _elementRef.nativeElement;
     }
     NgbDropdownToggle.prototype.toggleOpen = function () { this.dropdown.toggle(); };
     NgbDropdownToggle.prototype.isEventFrom = function ($event) { return this._elementRef.nativeElement.contains($event.target); };
@@ -2866,19 +2875,27 @@ NgbDropdownToggle.ctorParameters = function () { return [
  * Transforms a node into a dropdown.
  */
 var NgbDropdown = (function () {
-    function NgbDropdown(config) {
+    function NgbDropdown(config, ngZone) {
+        var _this = this;
         /**
          *  Defines whether or not the dropdown-menu is open initially.
          */
         this._open = false;
         /**
+         * Placement of a dropdown. Use "top-right" for dropups.
+         */
+        this.placement = '';
+        /**
          *  An event fired when the dropdown is opened or closed.
          *  Event's payload equals whether dropdown is open.
          */
         this.openChange = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["EventEmitter"]();
-        this.up = config.up;
+        this.placement = config.placement;
         this.autoClose = config.autoClose;
+        this._zoneSubscription = ngZone.onStable.subscribe(function () { _this._positionMenu(); });
     }
+    NgbDropdown.prototype.isUp = function () { return this.placement.indexOf('top') !== -1; };
+    NgbDropdown.prototype.isDown = function () { return this.placement.indexOf('bottom') !== -1; };
     /**
      * Checks if the dropdown menu is open or not.
      */
@@ -2889,6 +2906,7 @@ var NgbDropdown = (function () {
     NgbDropdown.prototype.open = function () {
         if (!this._open) {
             this._open = true;
+            this._positionMenu();
             this.openChange.emit(true);
         }
     };
@@ -2930,8 +2948,14 @@ var NgbDropdown = (function () {
             this.close();
         }
     };
+    NgbDropdown.prototype.ngOnDestroy = function () { this._zoneSubscription.unsubscribe(); };
     NgbDropdown.prototype._isEventFromToggle = function ($event) { return this._toggle ? this._toggle.isEventFrom($event) : false; };
     NgbDropdown.prototype._isEventFromMenu = function ($event) { return this._menu ? this._menu.isEventFrom($event) : false; };
+    NgbDropdown.prototype._positionMenu = function () {
+        if (this.isOpen() && this._menu && this._toggle) {
+            this._menu.position(this._toggle.anchorEl, this.placement);
+        }
+    };
     return NgbDropdown;
 }());
 
@@ -2940,8 +2964,8 @@ NgbDropdown.decorators = [
                 selector: '[ngbDropdown]',
                 exportAs: 'ngbDropdown',
                 host: {
-                    '[class.dropdown]': '!up',
-                    '[class.dropup]': 'up',
+                    '[class.dropdown]': 'isDown()',
+                    '[class.dropup]': 'isUp()',
                     '[class.show]': 'isOpen()',
                     '(keyup.esc)': 'closeFromOutsideEsc()',
                     '(document:click)': 'closeFromClick($event)'
@@ -2951,13 +2975,14 @@ NgbDropdown.decorators = [
 /** @nocollapse */
 NgbDropdown.ctorParameters = function () { return [
     { type: __WEBPACK_IMPORTED_MODULE_1__dropdown_config__["a" /* NgbDropdownConfig */], },
+    { type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["NgZone"], },
 ]; };
 NgbDropdown.propDecorators = {
     '_menu': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["ContentChild"], args: [NgbDropdownMenu,] },],
     '_toggle': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["ContentChild"], args: [NgbDropdownToggle,] },],
-    'up': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     'autoClose': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     '_open': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"], args: ['open',] },],
+    'placement': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     'openChange': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Output"] },],
 };
 //# sourceMappingURL=dropdown.js.map
@@ -4392,6 +4417,7 @@ NgbRatingModule.ctorParameters = function () { return []; };
 var NgbTabsetConfig = (function () {
     function NgbTabsetConfig() {
         this.justify = 'start';
+        this.orientation = 'horizontal';
         this.type = 'tabs';
     }
     return NgbTabsetConfig;
@@ -4497,7 +4523,25 @@ var NgbTabset = (function () {
         this.tabChange = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["EventEmitter"]();
         this.type = config.type;
         this.justify = config.justify;
+        this.orientation = config.orientation;
     }
+    Object.defineProperty(NgbTabset.prototype, "justify", {
+        /**
+         * The horizontal alignment of the nav with flexbox utilities. Can be one of 'start', 'center', 'end', 'fill' or
+         * 'justified'
+         * The default value is 'start'.
+         */
+        set: function (className) {
+            if (className === 'fill' || className === 'justified') {
+                this.justifyClass = "nav-" + className;
+            }
+            else {
+                this.justifyClass = "justify-content-" + className;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Selects the tab with the given id and shows its associated pane.
      * Any other tab that was previously selected becomes unselected and its associated pane is hidden.
@@ -4528,7 +4572,7 @@ NgbTabset.decorators = [
     { type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"], args: [{
                 selector: 'ngb-tabset',
                 exportAs: 'ngbTabset',
-                template: "\n    <ul [class]=\"'nav nav-' + type + ' justify-content-' + justify\" role=\"tablist\">\n      <li class=\"nav-item\" *ngFor=\"let tab of tabs\">\n        <a [id]=\"tab.id\" class=\"nav-link\" [class.active]=\"tab.id === activeId\" [class.disabled]=\"tab.disabled\"\n          href (click)=\"!!select(tab.id)\" role=\"tab\" [attr.tabindex]=\"(tab.disabled ? '-1': undefined)\"\n          [attr.aria-controls]=\"(!destroyOnHide || tab.id === activeId ? tab.id + '-panel' : null)\"\n          [attr.aria-expanded]=\"tab.id === activeId\" [attr.aria-disabled]=\"tab.disabled\">\n          {{tab.title}}<ng-template [ngTemplateOutlet]=\"tab.titleTpl?.templateRef\"></ng-template>\n        </a>\n      </li>\n    </ul>\n    <div class=\"tab-content\">\n      <ng-template ngFor let-tab [ngForOf]=\"tabs\">\n        <div\n          class=\"tab-pane {{tab.id === activeId ? 'active' : null}}\"\n          *ngIf=\"!destroyOnHide || tab.id === activeId\"\n          role=\"tabpanel\"\n          [attr.aria-labelledby]=\"tab.id\" id=\"{{tab.id}}-panel\"\n          [attr.aria-expanded]=\"tab.id === activeId\">\n          <ng-template [ngTemplateOutlet]=\"tab.contentTpl.templateRef\"></ng-template>\n        </div>\n      </ng-template>\n    </div>\n  "
+                template: "\n    <ul [class]=\"'nav nav-' + type + (orientation == 'horizontal'?  ' ' + justifyClass : ' flex-column')\" role=\"tablist\">\n      <li class=\"nav-item\" *ngFor=\"let tab of tabs\">\n        <a [id]=\"tab.id\" class=\"nav-link\" [class.active]=\"tab.id === activeId\" [class.disabled]=\"tab.disabled\"\n          href (click)=\"!!select(tab.id)\" role=\"tab\" [attr.tabindex]=\"(tab.disabled ? '-1': undefined)\"\n          [attr.aria-controls]=\"(!destroyOnHide || tab.id === activeId ? tab.id + '-panel' : null)\"\n          [attr.aria-expanded]=\"tab.id === activeId\" [attr.aria-disabled]=\"tab.disabled\">\n          {{tab.title}}<ng-template [ngTemplateOutlet]=\"tab.titleTpl?.templateRef\"></ng-template>\n        </a>\n      </li>\n    </ul>\n    <div class=\"tab-content\">\n      <ng-template ngFor let-tab [ngForOf]=\"tabs\">\n        <div\n          class=\"tab-pane {{tab.id === activeId ? 'active' : null}}\"\n          *ngIf=\"!destroyOnHide || tab.id === activeId\"\n          role=\"tabpanel\"\n          [attr.aria-labelledby]=\"tab.id\" id=\"{{tab.id}}-panel\"\n          [attr.aria-expanded]=\"tab.id === activeId\">\n          <ng-template [ngTemplateOutlet]=\"tab.contentTpl.templateRef\"></ng-template>\n        </div>\n      </ng-template>\n    </div>\n  "
             },] },
 ];
 /** @nocollapse */
@@ -4540,6 +4584,7 @@ NgbTabset.propDecorators = {
     'activeId': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     'destroyOnHide': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     'justify': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
+    'orientation': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     'type': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"] },],
     'tabChange': [{ type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Output"] },],
 };
@@ -5898,6 +5943,586 @@ function regExpEscape(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 //# sourceMappingURL=util.js.map
+
+/***/ }),
+
+/***/ "../../../../angular-2-dropdown-multiselect/dropdown/dropdown.component.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_rxjs_add_operator_takeUntil__ = __webpack_require__("../../../../rxjs/add/operator/takeUntil.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_rxjs_add_operator_takeUntil___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_rxjs_add_operator_takeUntil__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_forms__ = __webpack_require__("../../../forms/@angular/forms.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Subject__ = __webpack_require__("../../../../rxjs/Subject.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Subject___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Subject__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__search_filter_pipe__ = __webpack_require__("../../../../angular-2-dropdown-multiselect/dropdown/search-filter.pipe.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MultiselectDropdown; });
+
+
+
+
+
+
+/*
+ * Angular 2 Dropdown Multiselect for Bootstrap
+ *
+ * Simon Lindh
+ * https://github.com/softsimon/angular-2-dropdown-multiselect
+ */
+var MULTISELECT_VALUE_ACCESSOR = {
+    provide: __WEBPACK_IMPORTED_MODULE_2__angular_forms__["NG_VALUE_ACCESSOR"],
+    useExisting: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_core__["forwardRef"])(function () { return MultiselectDropdown; }),
+    multi: true
+};
+var MultiselectDropdown = (function () {
+    function MultiselectDropdown(element, fb, searchFilter, differs) {
+        this.element = element;
+        this.fb = fb;
+        this.searchFilter = searchFilter;
+        this.filterControl = this.fb.control('');
+        this.disabled = false;
+        this.selectionLimitReached = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        this.dropdownClosed = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        this.dropdownOpened = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        this.onAdded = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        this.onRemoved = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        this.onLazyLoad = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        this.onFilter = this.filterControl.valueChanges;
+        this.destroyed$ = new __WEBPACK_IMPORTED_MODULE_3_rxjs_Subject__["Subject"]();
+        this.filteredOptions = [];
+        this.renderFilteredOptions = [];
+        this.model = [];
+        this.numSelected = 0;
+        this.renderItems = true;
+        this.defaultSettings = {
+            closeOnClickOutside: true,
+            pullRight: false,
+            enableSearch: false,
+            searchRenderLimit: 0,
+            searchRenderAfter: 1,
+            searchMaxLimit: 0,
+            searchMaxRenderedItems: 0,
+            checkedStyle: 'checkboxes',
+            buttonClasses: 'btn btn-default btn-secondary',
+            containerClasses: 'dropdown-inline',
+            selectionLimit: 0,
+            minSelectionLimit: 0,
+            closeOnSelect: false,
+            autoUnselect: false,
+            showCheckAll: false,
+            showUncheckAll: false,
+            fixedTitle: false,
+            dynamicTitleMaxItems: 3,
+            maxHeight: '300px',
+            isLazyLoad: false,
+            stopScrollPropagation: false,
+            loadViewDistance: 1
+        };
+        this.defaultTexts = {
+            checkAll: 'Check all',
+            uncheckAll: 'Uncheck all',
+            checked: 'checked',
+            checkedPlural: 'checked',
+            searchPlaceholder: 'Search...',
+            searchEmptyResult: 'Nothing found...',
+            searchNoRenderText: 'Type in search box to see results...',
+            defaultTitle: 'Select',
+            allSelected: 'All selected',
+        };
+        this._isVisible = false;
+        this._workerDocClicked = false;
+        this.onModelChange = function (_) { };
+        this.onModelTouched = function () { };
+        this.differ = differs.find([]).create(null);
+        this.settings = this.defaultSettings;
+        this.texts = this.defaultTexts;
+    }
+    MultiselectDropdown.prototype.onClick = function (target) {
+        if (!this.isVisible || !this.settings.closeOnClickOutside)
+            return;
+        var parentFound = false;
+        while (target != null && !parentFound) {
+            if (target === this.element.nativeElement) {
+                parentFound = true;
+            }
+            target = target.parentElement;
+        }
+        if (!parentFound) {
+            this.isVisible = false;
+            this.dropdownClosed.emit();
+        }
+    };
+    Object.defineProperty(MultiselectDropdown.prototype, "isVisible", {
+        get: function () {
+            return this._isVisible;
+        },
+        set: function (val) {
+            this._isVisible = val;
+            this._workerDocClicked = val ? false : this._workerDocClicked;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MultiselectDropdown.prototype, "searchLimit", {
+        get: function () {
+            return this.settings.searchRenderLimit;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MultiselectDropdown.prototype, "searchRenderAfter", {
+        get: function () {
+            return this.settings.searchRenderAfter;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MultiselectDropdown.prototype, "searchLimitApplied", {
+        get: function () {
+            return this.searchLimit > 0 && this.options.length > this.searchLimit;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    MultiselectDropdown.prototype.getItemStyle = function (option) {
+        if (!option.isLabel) {
+            return { 'cursor': 'pointer' };
+        }
+    };
+    MultiselectDropdown.prototype.getItemStyleSelectionDisabled = function () {
+        if (this.disabledSelection) {
+            return { 'cursor': 'default' };
+        }
+    };
+    MultiselectDropdown.prototype.ngOnInit = function () {
+        this.settings = Object.assign(this.defaultSettings, this.settings);
+        this.texts = Object.assign(this.defaultTexts, this.texts);
+        this.title = this.texts.defaultTitle || '';
+        this.filterControl.valueChanges
+            .takeUntil(this.destroyed$)
+            .subscribe(function () {
+            this.updateRenderItems();
+            if (this.settings.isLazyLoad) {
+                this.load();
+            }
+        }.bind(this));
+    };
+    MultiselectDropdown.prototype.ngOnChanges = function (changes) {
+        if (changes['options']) {
+            this.options = this.options || [];
+            this.parents = this.options
+                .filter(function (option) { return typeof option.parentId === 'number'; })
+                .map(function (option) { return option.parentId; });
+            this.updateRenderItems();
+            if (this.texts) {
+                this.updateTitle();
+            }
+        }
+        if (changes['texts'] && !changes['texts'].isFirstChange()) {
+            this.updateTitle();
+        }
+    };
+    MultiselectDropdown.prototype.ngOnDestroy = function () {
+        this.destroyed$.next();
+    };
+    MultiselectDropdown.prototype.updateRenderItems = function () {
+        this.renderItems = !this.searchLimitApplied || this.filterControl.value.length >= this.searchRenderAfter;
+        this.filteredOptions = this.searchFilter.transform(this.options, this.settings.isLazyLoad ? '' : this.filterControl.value, this.settings.searchMaxLimit, this.settings.searchMaxRenderedItems);
+        this.renderFilteredOptions = this.renderItems ? this.filteredOptions : [];
+    };
+    MultiselectDropdown.prototype.writeValue = function (value) {
+        if (value !== undefined && value !== null) {
+            this.model = Array.isArray(value) ? value : [value];
+        }
+        else {
+            this.model = [];
+        }
+    };
+    MultiselectDropdown.prototype.registerOnChange = function (fn) {
+        this.onModelChange = fn;
+    };
+    MultiselectDropdown.prototype.registerOnTouched = function (fn) {
+        this.onModelTouched = fn;
+    };
+    MultiselectDropdown.prototype.setDisabledState = function (isDisabled) {
+        this.disabled = isDisabled;
+    };
+    MultiselectDropdown.prototype.ngDoCheck = function () {
+        var changes = this.differ.diff(this.model);
+        if (changes) {
+            this.updateNumSelected();
+            this.updateTitle();
+        }
+    };
+    MultiselectDropdown.prototype.validate = function (_c) {
+        return (this.model && this.model.length) ? null : {
+            required: {
+                valid: false,
+            },
+        };
+    };
+    MultiselectDropdown.prototype.registerOnValidatorChange = function (_fn) {
+        throw new Error('Method not implemented.');
+    };
+    MultiselectDropdown.prototype.clearSearch = function (event) {
+        if (event.stopPropagation) {
+            event.stopPropagation();
+        }
+        this.filterControl.setValue('');
+    };
+    MultiselectDropdown.prototype.toggleDropdown = function () {
+        this.isVisible = !this.isVisible;
+        this.isVisible ? this.dropdownOpened.emit() : this.dropdownClosed.emit();
+    };
+    MultiselectDropdown.prototype.isSelected = function (option) {
+        return this.model && this.model.indexOf(option.id) > -1;
+    };
+    MultiselectDropdown.prototype.setSelected = function (_event, option) {
+        var _this = this;
+        if (option.isLabel) {
+            return;
+        }
+        if (!this.disabledSelection) {
+            if (_event.stopPropagation) {
+                _event.stopPropagation();
+            }
+            var index = this.model.indexOf(option.id);
+            if (index > -1) {
+                if ((this.settings.minSelectionLimit === undefined) || (this.numSelected > this.settings.minSelectionLimit)) {
+                    this.model.splice(index, 1);
+                    this.onRemoved.emit(option.id);
+                }
+                var parentIndex = option.parentId && this.model.indexOf(option.parentId);
+                if (parentIndex >= 0) {
+                    this.model.splice(parentIndex, 1);
+                    this.onRemoved.emit(option.parentId);
+                }
+                else if (this.parents.indexOf(option.id) > -1) {
+                    var childIds_1 = this.options.filter(function (child) { return _this.model.indexOf(child.id) > -1 && child.parentId == option.id; }).map(function (child) { return child.id; });
+                    this.model = this.model.filter(function (id) { return childIds_1.indexOf(id) < 0; });
+                    childIds_1.forEach(function (childId) { return _this.onRemoved.emit(childId); });
+                }
+            }
+            else {
+                if (this.settings.selectionLimit === 0 || (this.settings.selectionLimit && this.model.length < this.settings.selectionLimit)) {
+                    this.model.push(option.id);
+                    this.onAdded.emit(option.id);
+                    if (option.parentId) {
+                        var children = this.options.filter(function (child) { return child.id !== option.id && child.parentId == option.parentId; });
+                        if (children.every(function (child) { return _this.model.indexOf(child.id) > -1; })) {
+                            this.model.push(option.parentId);
+                            this.onAdded.emit(option.parentId);
+                        }
+                    }
+                    else if (this.parents.indexOf(option.id) > -1) {
+                        var children = this.options.filter(function (child) { return _this.model.indexOf(child.id) < 0 && child.parentId == option.id; });
+                        children.forEach(function (child) {
+                            _this.model.push(child.id);
+                            _this.onAdded.emit(child.id);
+                        });
+                    }
+                }
+                else {
+                    if (this.settings.autoUnselect) {
+                        this.model.push(option.id);
+                        this.onAdded.emit(option.id);
+                        var removedOption = this.model.shift();
+                        this.onRemoved.emit(removedOption);
+                    }
+                    else {
+                        this.selectionLimitReached.emit(this.model.length);
+                        return;
+                    }
+                }
+            }
+            if (this.settings.closeOnSelect) {
+                this.toggleDropdown();
+            }
+            this.model = this.model.slice();
+            this.onModelChange(this.model);
+            this.onModelTouched();
+        }
+    };
+    MultiselectDropdown.prototype.updateNumSelected = function () {
+        var _this = this;
+        this.numSelected = this.model.filter(function (id) { return _this.parents.indexOf(id) < 0; }).length || 0;
+    };
+    MultiselectDropdown.prototype.updateTitle = function () {
+        var _this = this;
+        if (this.numSelected === 0 || this.settings.fixedTitle) {
+            this.title = (this.texts) ? this.texts.defaultTitle : '';
+        }
+        else if (this.settings.displayAllSelectedText && this.model.length === this.options.length) {
+            this.title = (this.texts) ? this.texts.allSelected : '';
+        }
+        else if (this.settings.dynamicTitleMaxItems && this.settings.dynamicTitleMaxItems >= this.numSelected) {
+            this.title = this.options
+                .filter(function (option) {
+                return _this.model.indexOf(option.id) > -1;
+            })
+                .map(function (option) { return option.name; })
+                .join(', ');
+        }
+        else {
+            this.title = this.numSelected
+                + ' '
+                + (this.numSelected === 1 ? this.texts.checked : this.texts.checkedPlural);
+        }
+    };
+    MultiselectDropdown.prototype.searchFilterApplied = function () {
+        return this.settings.enableSearch && this.filterControl.value && this.filterControl.value.length > 0;
+    };
+    MultiselectDropdown.prototype.checkAll = function () {
+        var _this = this;
+        if (!this.disabledSelection) {
+            var checkedOptions = (!this.searchFilterApplied() ? this.options : this.filteredOptions)
+                .filter(function (option) {
+                if (_this.model.indexOf(option.id) === -1) {
+                    _this.onAdded.emit(option.id);
+                    return true;
+                }
+                return false;
+            }).map(function (option) { return option.id; });
+            this.model = this.model.concat(checkedOptions);
+            this.onModelChange(this.model);
+            this.onModelTouched();
+        }
+    };
+    MultiselectDropdown.prototype.uncheckAll = function () {
+        var _this = this;
+        if (!this.disabledSelection) {
+            var unCheckedOptions_1 = (!this.searchFilterApplied() ? this.model
+                : this.filteredOptions.map(function (option) { return option.id; }));
+            this.model = this.model.filter(function (id) {
+                if (((unCheckedOptions_1.indexOf(id) < 0) && (_this.settings.minSelectionLimit === undefined)) || ((unCheckedOptions_1.indexOf(id) < _this.settings.minSelectionLimit))) {
+                    return true;
+                }
+                else {
+                    _this.onRemoved.emit(id);
+                    return false;
+                }
+            });
+            this.onModelChange(this.model);
+            this.onModelTouched();
+        }
+    };
+    MultiselectDropdown.prototype.preventCheckboxCheck = function (event, option) {
+        if (this.settings.selectionLimit && !this.settings.autoUnselect &&
+            this.model.length >= this.settings.selectionLimit &&
+            this.model.indexOf(option.id) === -1 &&
+            event.preventDefault) {
+            event.preventDefault();
+        }
+    };
+    MultiselectDropdown.prototype.isCheckboxDisabled = function () {
+        return this.disabledSelection;
+    };
+    MultiselectDropdown.prototype.checkScrollPosition = function (ev) {
+        var scrollTop = ev.target.scrollTop;
+        var scrollHeight = ev.target.scrollHeight;
+        var scrollElementHeight = ev.target.clientHeight;
+        var roundingPixel = 1;
+        var gutterPixel = 1;
+        if (scrollTop >= scrollHeight - (1 + this.settings.loadViewDistance) * scrollElementHeight - roundingPixel - gutterPixel) {
+            this.load();
+        }
+    };
+    MultiselectDropdown.prototype.checkScrollPropagation = function (ev, element) {
+        var scrollTop = element.scrollTop;
+        var scrollHeight = element.scrollHeight;
+        var scrollElementHeight = element.clientHeight;
+        if ((ev.deltaY > 0 && scrollTop + scrollElementHeight >= scrollHeight) || (ev.deltaY < 0 && scrollTop <= 0)) {
+            ev = ev || window.event;
+            ev.preventDefault && ev.preventDefault();
+            ev.returnValue = false;
+        }
+    };
+    MultiselectDropdown.prototype.load = function () {
+        this.onLazyLoad.emit({
+            length: this.options.length,
+            filter: this.filterControl.value
+        });
+    };
+    return MultiselectDropdown;
+}());
+
+MultiselectDropdown.decorators = [
+    { type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Component"], args: [{
+                selector: 'ss-multiselect-dropdown',
+                template: '<div class="dropdown" [ngClass]="settings.containerClasses" [class.open]="isVisible"><button type="button" class="dropdown-toggle" [ngClass]="settings.buttonClasses" (click)="toggleDropdown()" [disabled]="disabled">{{ title }}<span class="caret"></span></button><ul #scroller *ngIf="isVisible" class="dropdown-menu" (scroll)="settings.isLazyLoad ? checkScrollPosition($event) : null" (wheel)="settings.stopScrollPropagation ? checkScrollPropagation($event, scroller) : null" [class.pull-right]="settings.pullRight" [class.dropdown-menu-right]="settings.pullRight" [style.max-height]="settings.maxHeight" style="display: block; height: auto; overflow-y: auto"><li class="dropdown-item search" *ngIf="settings.enableSearch"><div class="input-group input-group-sm"><span class="input-group-addon" id="sizing-addon3"><i class="fa fa-search"></i></span> <input type="text" class="form-control" placeholder="{{ texts.searchPlaceholder }}" aria-describedby="sizing-addon3" [formControl]="filterControl" autofocus> <span class="input-group-btn" *ngIf="filterControl.value.length > 0"><button class="btn btn-default btn-secondary" type="button" (click)="clearSearch($event)"><i class="fa fa-times"></i></button></span></div></li><li class="dropdown-divider divider" *ngIf="settings.enableSearch"></li><li class="dropdown-item check-control check-control-check" *ngIf="settings.showCheckAll && !disabledSelection"><a href="javascript:;" role="menuitem" tabindex="-1" (click)="checkAll()"><span style="width: 16px" [ngClass]="{\'glyphicon glyphicon-ok\': settings.checkedStyle !== \'fontawesome\',\'fa fa-check\': settings.checkedStyle === \'fontawesome\'}"></span> {{ texts.checkAll }}</a></li><li class="dropdown-item check-control check-control-uncheck" *ngIf="settings.showUncheckAll && !disabledSelection"><a href="javascript:;" role="menuitem" tabindex="-1" (click)="uncheckAll()"><span style="width: 16px" [ngClass]="{\'glyphicon glyphicon-remove\': settings.checkedStyle !== \'fontawesome\',\'fa fa-times\': settings.checkedStyle === \'fontawesome\'}"></span> {{ texts.uncheckAll }}</a></li><li *ngIf="settings.showCheckAll || settings.showUncheckAll" class="dropdown-divider divider"></li><li *ngIf="!renderItems" class="dropdown-item empty">{{ texts.searchNoRenderText }}</li><li *ngIf="renderItems && !renderFilteredOptions.length" class="dropdown-item empty">{{ texts.searchEmptyResult }}</li><li class="dropdown-item" *ngFor="let option of renderFilteredOptions" (click)="setSelected($event, option)" [ngStyle]="getItemStyle(option)" [ngClass]="option.classes" [class.dropdown-header]="option.isLabel"><a *ngIf="!option.isLabel; else label" href="javascript:;" role="menuitem" tabindex="-1" [style.padding-left]="this.parents.length>0&&this.parents.indexOf(option.id)<0&&\'30px\'" [ngStyle]="getItemStyleSelectionDisabled()"><ng-container [ngSwitch]="settings.checkedStyle"><input *ngSwitchCase="\'checkboxes\'" type="checkbox" [checked]="isSelected(option)" (click)="preventCheckboxCheck($event, option)" [disabled]="isCheckboxDisabled()" [ngStyle]="getItemStyleSelectionDisabled()" > <span *ngSwitchCase="\'glyphicon\'" style="width: 16px" class="glyphicon" [class.glyphicon-ok]="isSelected(option)"></span> <span *ngSwitchCase="\'fontawesome\'" style="width: 16px;display: inline-block"><i *ngIf="isSelected(option)" class="fa fa-check" aria-hidden="true"></i></span></ng-container><span [ngClass]="settings.itemClasses" [style.font-weight]="this.parents.indexOf(option.id)>=0?\'bold\':\'normal\'">{{ option.name }}</span></a><ng-template #label>{{ option.name }}</ng-template></li></ul></div>',
+                styles: ['a {  outline: none !important;}.dropdown-inline {  display: inline-block;}.dropdown-toggle .caret {  margin-left: 4px;  white-space: nowrap;  display: inline-block;}'],
+                providers: [MULTISELECT_VALUE_ACCESSOR, __WEBPACK_IMPORTED_MODULE_4__search_filter_pipe__["a" /* MultiSelectSearchFilter */]]
+            },] },
+];
+/** @nocollapse */
+MultiselectDropdown.ctorParameters = function () { return [
+    { type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["ElementRef"], },
+    { type: __WEBPACK_IMPORTED_MODULE_2__angular_forms__["FormBuilder"], },
+    { type: __WEBPACK_IMPORTED_MODULE_4__search_filter_pipe__["a" /* MultiSelectSearchFilter */], },
+    { type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["IterableDiffers"], },
+]; };
+MultiselectDropdown.propDecorators = {
+    'options': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Input"] },],
+    'settings': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Input"] },],
+    'texts': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Input"] },],
+    'disabled': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Input"] },],
+    'disabledSelection': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Input"] },],
+    'selectionLimitReached': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"] },],
+    'dropdownClosed': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"] },],
+    'dropdownOpened': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"] },],
+    'onAdded': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"] },],
+    'onRemoved': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"] },],
+    'onLazyLoad': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"] },],
+    'onFilter': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"] },],
+    'onClick': [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["HostListener"], args: ['document: click', ['$event.target'],] },],
+};
+//# sourceMappingURL=dropdown.component.js.map
+
+/***/ }),
+
+/***/ "../../../../angular-2-dropdown-multiselect/dropdown/dropdown.module.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__dropdown_component__ = __webpack_require__("../../../../angular-2-dropdown-multiselect/dropdown/dropdown.component.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__search_filter_pipe__ = __webpack_require__("../../../../angular-2-dropdown-multiselect/dropdown/search-filter.pipe.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_common__ = __webpack_require__("../../../common/@angular/common.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__angular_forms__ = __webpack_require__("../../../forms/@angular/forms.es5.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MultiselectDropdownModule; });
+
+
+
+
+
+var MultiselectDropdownModule = (function () {
+    function MultiselectDropdownModule() {
+    }
+    return MultiselectDropdownModule;
+}());
+
+MultiselectDropdownModule.decorators = [
+    { type: __WEBPACK_IMPORTED_MODULE_3__angular_core__["NgModule"], args: [{
+                imports: [__WEBPACK_IMPORTED_MODULE_2__angular_common__["CommonModule"], __WEBPACK_IMPORTED_MODULE_4__angular_forms__["ReactiveFormsModule"]],
+                exports: [__WEBPACK_IMPORTED_MODULE_0__dropdown_component__["a" /* MultiselectDropdown */], __WEBPACK_IMPORTED_MODULE_1__search_filter_pipe__["a" /* MultiSelectSearchFilter */]],
+                declarations: [__WEBPACK_IMPORTED_MODULE_0__dropdown_component__["a" /* MultiselectDropdown */], __WEBPACK_IMPORTED_MODULE_1__search_filter_pipe__["a" /* MultiSelectSearchFilter */]],
+            },] },
+];
+/** @nocollapse */
+MultiselectDropdownModule.ctorParameters = function () { return []; };
+//# sourceMappingURL=dropdown.module.js.map
+
+/***/ }),
+
+/***/ "../../../../angular-2-dropdown-multiselect/dropdown/search-filter.pipe.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MultiSelectSearchFilter; });
+
+var MultiSelectSearchFilter = (function () {
+    function MultiSelectSearchFilter() {
+        this._searchCache = {};
+        this._searchCacheInclusive = {};
+    }
+    MultiSelectSearchFilter.prototype.transform = function (options, str, limit, renderLimit) {
+        if (limit === void 0) { limit = 0; }
+        if (renderLimit === void 0) { renderLimit = 0; }
+        str = (str || '').toLowerCase();
+        // Drop cache because options were updated
+        if (options !== this._lastOptions) {
+            this._lastOptions = options;
+            this._searchCache = {};
+            this._searchCacheInclusive = {};
+        }
+        var isUnderLimit = options.length <= limit;
+        if (this._searchCache[str]) {
+            return isUnderLimit ? this._searchCache[str] : this._limitRenderedItems(this._searchCache[str], renderLimit);
+        }
+        var prevStr = str.slice(0, -1);
+        var prevResults = this._searchCache[prevStr];
+        if (prevResults) {
+            var prevInclusiveOrIdx = this._searchCacheInclusive[prevStr];
+            if (prevInclusiveOrIdx === true) {
+                // If have previous results and it was inclusive, do only subsearch
+                options = prevResults;
+            }
+            else if (typeof prevInclusiveOrIdx === 'number') {
+                // Or reuse prev results with unchecked ones
+                options = prevResults.concat(options.slice(prevInclusiveOrIdx));
+            }
+        }
+        var optsLength = options.length;
+        var maxFound = limit > 0 ? Math.min(limit, optsLength) : optsLength;
+        var filteredOpts = [];
+        var regexp = new RegExp(this._escapeRegExp(str), 'i');
+        var matchPredicate = function (option) { return regexp.test(option.name); }, getChildren = function (option) { return options.filter(function (child) { return child.parentId === option.id; }); }, getParent = function (option) { return options.find(function (parent) { return option.parentId === parent.id; }); };
+        var i = 0, founded = 0;
+        for (; i < optsLength && founded < maxFound; ++i) {
+            var option = options[i];
+            var directMatch = regexp.test(option.name);
+            if (directMatch) {
+                filteredOpts.push(option);
+                founded++;
+                continue;
+            }
+            if (typeof (option.parentId) === 'undefined') {
+                var childrenMatch = getChildren(option).some(matchPredicate);
+                if (childrenMatch) {
+                    filteredOpts.push(option);
+                    founded++;
+                    continue;
+                }
+            }
+            if (typeof (option.parentId) !== 'undefined') {
+                var parentMatch = matchPredicate(getParent(option));
+                if (parentMatch) {
+                    filteredOpts.push(option);
+                    founded++;
+                    continue;
+                }
+            }
+        }
+        this._searchCache[str] = filteredOpts;
+        this._searchCacheInclusive[str] = i === optsLength || i + 1;
+        return isUnderLimit ? filteredOpts : this._limitRenderedItems(filteredOpts, renderLimit);
+    };
+    MultiSelectSearchFilter.prototype._limitRenderedItems = function (items, limit) {
+        return items.length > limit && limit > 0 ? items.slice(0, limit) : items;
+    };
+    MultiSelectSearchFilter.prototype._escapeRegExp = function (str) {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    };
+    return MultiSelectSearchFilter;
+}());
+
+MultiSelectSearchFilter.decorators = [
+    { type: __WEBPACK_IMPORTED_MODULE_0__angular_core__["Pipe"], args: [{
+                name: 'searchFilter'
+            },] },
+];
+/** @nocollapse */
+MultiSelectSearchFilter.ctorParameters = function () { return []; };
+//# sourceMappingURL=search-filter.pipe.js.map
+
+/***/ }),
+
+/***/ "../../../../angular-2-dropdown-multiselect/index.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__dropdown_search_filter_pipe__ = __webpack_require__("../../../../angular-2-dropdown-multiselect/dropdown/search-filter.pipe.js");
+/* unused harmony namespace reexport */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dropdown_dropdown_module__ = __webpack_require__("../../../../angular-2-dropdown-multiselect/dropdown/dropdown.module.js");
+/* harmony namespace reexport (by used) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_1__dropdown_dropdown_module__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dropdown_dropdown_component__ = __webpack_require__("../../../../angular-2-dropdown-multiselect/dropdown/dropdown.component.js");
+/* unused harmony namespace reexport */
+
+
+
+//# sourceMappingURL=index.js.map
 
 /***/ }),
 
@@ -7581,6 +8206,18 @@ function flattenUnsubscriptionErrors(errors) {
     return errors.reduce(function (errs, err) { return errs.concat((err instanceof UnsubscriptionError_1.UnsubscriptionError) ? err.errors : err); }, []);
 }
 //# sourceMappingURL=Subscription.js.map
+
+/***/ }),
+
+/***/ "../../../../rxjs/add/operator/takeUntil.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Observable_1 = __webpack_require__("../../../../rxjs/Observable.js");
+var takeUntil_1 = __webpack_require__("../../../../rxjs/operator/takeUntil.js");
+Observable_1.Observable.prototype.takeUntil = takeUntil_1.takeUntil;
+//# sourceMappingURL=takeUntil.js.map
 
 /***/ }),
 
@@ -10779,6 +11416,88 @@ var SwitchMapSubscriber = (function (_super) {
 
 /***/ }),
 
+/***/ "../../../../rxjs/operator/takeUntil.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var OuterSubscriber_1 = __webpack_require__("../../../../rxjs/OuterSubscriber.js");
+var subscribeToResult_1 = __webpack_require__("../../../../rxjs/util/subscribeToResult.js");
+/**
+ * Emits the values emitted by the source Observable until a `notifier`
+ * Observable emits a value.
+ *
+ * <span class="informal">Lets values pass until a second Observable,
+ * `notifier`, emits something. Then, it completes.</span>
+ *
+ * <img src="./img/takeUntil.png" width="100%">
+ *
+ * `takeUntil` subscribes and begins mirroring the source Observable. It also
+ * monitors a second Observable, `notifier` that you provide. If the `notifier`
+ * emits a value or a complete notification, the output Observable stops
+ * mirroring the source Observable and completes.
+ *
+ * @example <caption>Tick every second until the first click happens</caption>
+ * var interval = Rx.Observable.interval(1000);
+ * var clicks = Rx.Observable.fromEvent(document, 'click');
+ * var result = interval.takeUntil(clicks);
+ * result.subscribe(x => console.log(x));
+ *
+ * @see {@link take}
+ * @see {@link takeLast}
+ * @see {@link takeWhile}
+ * @see {@link skip}
+ *
+ * @param {Observable} notifier The Observable whose first emitted value will
+ * cause the output Observable of `takeUntil` to stop emitting values from the
+ * source Observable.
+ * @return {Observable<T>} An Observable that emits the values from the source
+ * Observable until such time as `notifier` emits its first value.
+ * @method takeUntil
+ * @owner Observable
+ */
+function takeUntil(notifier) {
+    return this.lift(new TakeUntilOperator(notifier));
+}
+exports.takeUntil = takeUntil;
+var TakeUntilOperator = (function () {
+    function TakeUntilOperator(notifier) {
+        this.notifier = notifier;
+    }
+    TakeUntilOperator.prototype.call = function (subscriber, source) {
+        return source.subscribe(new TakeUntilSubscriber(subscriber, this.notifier));
+    };
+    return TakeUntilOperator;
+}());
+/**
+ * We need this JSDoc comment for affecting ESDoc.
+ * @ignore
+ * @extends {Ignored}
+ */
+var TakeUntilSubscriber = (function (_super) {
+    __extends(TakeUntilSubscriber, _super);
+    function TakeUntilSubscriber(destination, notifier) {
+        _super.call(this, destination);
+        this.notifier = notifier;
+        this.add(subscribeToResult_1.subscribeToResult(this, notifier));
+    }
+    TakeUntilSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex, innerSub) {
+        this.complete();
+    };
+    TakeUntilSubscriber.prototype.notifyComplete = function () {
+        // noop
+    };
+    return TakeUntilSubscriber;
+}(OuterSubscriber_1.OuterSubscriber));
+//# sourceMappingURL=takeUntil.js.map
+
+/***/ }),
+
 /***/ "../../../../rxjs/symbol/iterator.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11459,7 +12178,7 @@ module.exports = g;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return AnimationGroupPlayer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return ɵPRE_STYLE; });
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -11592,11 +12311,12 @@ var AUTO_STYLE = '*';
  * <div [\@myAnimationTrigger]="myStatusExp">...</div>
  * ```
  *
- * ## Disable Child Animations
+ * ## Disable Animations
  * A special animation control binding called `\@.disabled` can be placed on an element which will
- * then disable animations for any inner animation triggers situated within the element.
+ * then disable animations for any inner animation triggers situated within the element as well as
+ * any animations on the element itself.
  *
- * When true, the `\@.disabled` binding will prevent inner animations from rendering. The example
+ * When true, the `\@.disabled` binding will prevent all animations from rendering. The example
  * below shows how to use this feature:
  *
  * ```ts
@@ -11622,8 +12342,8 @@ var AUTO_STYLE = '*';
  * The `\@childAnimation` trigger will not animate because `\@.disabled` prevents it from happening
  * (when true).
  *
- * Note that `\@.disbled` will only disable inner animations (any animations running on the same
- * element will not be disabled).
+ * Note that `\@.disbled` will only disable all animations (this means any animations running on
+ * the same element will also be disabled).
  *
  * ### Disabling Animations Application-wide
  * When an area of the template is set to have animations disabled, **all** inner components will
@@ -12775,7 +13495,7 @@ var ɵPRE_STYLE = '!';
 /* unused harmony export ɵWebAnimationsPlayer */
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -16617,6 +17337,7 @@ var TransitionAnimationEngine = (function () {
         var /** @type {?} */ allPostStyleElements = new Map();
         var /** @type {?} */ disabledElementsSet = new Set();
         this.disabledNodes.forEach(function (node) {
+            disabledElementsSet.add(node);
             var /** @type {?} */ nodesThatAreDisabled = _this.driver.query(node, QUEUED_SELECTOR, true);
             for (var /** @type {?} */ i = 0; i < nodesThatAreDisabled.length; i++) {
                 disabledElementsSet.add(nodesThatAreDisabled[i]);
@@ -16737,15 +17458,37 @@ var TransitionAnimationEngine = (function () {
         skippedPlayers.forEach(function (player) {
             var /** @type {?} */ element = player.element;
             var /** @type {?} */ previousPlayers = _this._getPreviousPlayers(element, false, player.namespaceId, player.triggerName, null);
-            previousPlayers.forEach(function (prevPlayer) { getOrSetAsInMap(allPreviousPlayersMap, element, []).push(prevPlayer); });
+            previousPlayers.forEach(function (prevPlayer) {
+                getOrSetAsInMap(allPreviousPlayersMap, element, []).push(prevPlayer);
+                prevPlayer.destroy();
+            });
         });
-        allPreviousPlayersMap.forEach(function (players) { return players.forEach(function (player) { return player.destroy(); }); });
-        // PRE STAGE: fill the ! styles
-        var /** @type {?} */ preStylesMap = allPreStyleElements.size ?
-            cloakAndComputeStyles(this.driver, enterNodesWithoutAnimations, allPreStyleElements, __WEBPACK_IMPORTED_MODULE_1__angular_animations__["f" /* ɵPRE_STYLE */]) :
-            new Map();
+        // this is a special case for nodes that will be removed (either by)
+        // having their own leave animations or by being queried in a container
+        // that will be removed once a parent animation is complete. The idea
+        // here is that * styles must be identical to ! styles because of
+        // backwards compatibility (* is also filled in by default in many places).
+        // Otherwise * styles will return an empty value or auto since the element
+        // that is being getComputedStyle'd will not be visible (since * = destination)
+        var /** @type {?} */ replaceNodes = allLeaveNodes.filter(function (node) {
+            return replacePostStylesAsPre(node, allPreStyleElements, allPostStyleElements);
+        });
         // POST STAGE: fill the * styles
-        var /** @type {?} */ postStylesMap = cloakAndComputeStyles(this.driver, leaveNodesWithoutAnimations, allPostStyleElements, __WEBPACK_IMPORTED_MODULE_1__angular_animations__["g" /* AUTO_STYLE */]);
+        var _a = cloakAndComputeStyles(this.driver, leaveNodesWithoutAnimations, allPostStyleElements, __WEBPACK_IMPORTED_MODULE_1__angular_animations__["g" /* AUTO_STYLE */]), postStylesMap = _a[0], allLeaveQueriedNodes = _a[1];
+        allLeaveQueriedNodes.forEach(function (node) {
+            if (replacePostStylesAsPre(node, allPreStyleElements, allPostStyleElements)) {
+                replaceNodes.push(node);
+            }
+        });
+        // PRE STAGE: fill the ! styles
+        var preStylesMap = (allPreStyleElements.size ?
+            cloakAndComputeStyles(this.driver, enterNodesWithoutAnimations, allPreStyleElements, __WEBPACK_IMPORTED_MODULE_1__angular_animations__["f" /* ɵPRE_STYLE */]) :
+            [new Map()])[0];
+        replaceNodes.forEach(function (node) {
+            var /** @type {?} */ post = postStylesMap.get(node);
+            var /** @type {?} */ pre = preStylesMap.get(node);
+            postStylesMap.set(node, /** @type {?} */ (Object.assign({}, post, pre)));
+        });
         var /** @type {?} */ rootPlayers = [];
         var /** @type {?} */ subPlayers = [];
         queuedInstructions.forEach(function (entry) {
@@ -16783,10 +17526,19 @@ var TransitionAnimationEngine = (function () {
             else {
                 eraseStyles(element, instruction.fromStyles);
                 player.onDestroy(function () { return setStyles(element, instruction.toStyles); });
+                // there still might be a ancestor player animating this
+                // element therefore we will still add it as a sub player
+                // even if its animation may be disabled
                 subPlayers.push(player);
+                if (disabledElementsSet.has(element)) {
+                    skippedPlayers.push(player);
+                }
             }
         });
+        // find all of the sub players' corresponding inner animation player
         subPlayers.forEach(function (player) {
+            // even if any players are not found for a sub animation then it
+            // will still complete itself after the next tick since it's Noop
             var /** @type {?} */ playersForElement = skippedPlayersMap.get(player.element);
             if (playersForElement && playersForElement.length) {
                 var /** @type {?} */ innerPlayer = optimizeGroupPlayer(playersForElement);
@@ -16833,8 +17585,9 @@ var TransitionAnimationEngine = (function () {
                     }
                 }
             }
-            if (players.length) {
-                removeNodesAfterAnimationDone(this, element, players);
+            var /** @type {?} */ activePlayers = players.filter(function (p) { return !p.destroyed; });
+            if (activePlayers.length) {
+                removeNodesAfterAnimationDone(this, element, activePlayers);
             }
             else {
                 this.processLeaveNode(element);
@@ -16929,9 +17682,6 @@ var TransitionAnimationEngine = (function () {
      */
     TransitionAnimationEngine.prototype._beforeAnimationBuild = function (namespaceId, instruction, allPreviousPlayersMap) {
         var _this = this;
-        // it's important to do this step before destroying the players
-        // so that the onDone callback below won't fire before this
-        eraseStyles(instruction.element, instruction.fromStyles);
         var /** @type {?} */ triggerName = instruction.triggerName;
         var /** @type {?} */ rootElement = instruction.element;
         // when a removal animation occurs, ALL previous players are collected
@@ -16948,9 +17698,13 @@ var TransitionAnimationEngine = (function () {
                 if (realPlayer.beforeDestroy) {
                     realPlayer.beforeDestroy();
                 }
+                player.destroy();
                 players.push(player);
             });
         });
+        // this needs to be done so that the PRE/POST styles can be
+        // computed properly without interfering with the previous animation
+        eraseStyles(rootElement, instruction.fromStyles);
     };
     /**
      * @param {?} namespaceId
@@ -17262,6 +18016,7 @@ function cloakElement(element, value) {
 function cloakAndComputeStyles(driver, elements, elementPropsMap, defaultStyle) {
     var /** @type {?} */ cloakVals = elements.map(function (element) { return cloakElement(element); });
     var /** @type {?} */ valuesMap = new Map();
+    var /** @type {?} */ failedElements = [];
     elementPropsMap.forEach(function (props, element) {
         var /** @type {?} */ styles = {};
         props.forEach(function (prop) {
@@ -17270,12 +18025,13 @@ function cloakAndComputeStyles(driver, elements, elementPropsMap, defaultStyle) 
             // by a parent animation element being detached.
             if (!value || value.length == 0) {
                 element[REMOVAL_FLAG] = NULL_REMOVED_QUERIED_STATE;
+                failedElements.push(element);
             }
         });
         valuesMap.set(element, styles);
     });
     elements.forEach(function (element, i) { return cloakElement(element, cloakVals[i]); });
-    return valuesMap;
+    return [valuesMap, failedElements];
 }
 /**
  * @param {?} nodes
@@ -17406,6 +18162,26 @@ function objEquals(a, b) {
         if (!b.hasOwnProperty(prop) || a[prop] !== b[prop])
             return false;
     }
+    return true;
+}
+/**
+ * @param {?} element
+ * @param {?} allPreStyleElements
+ * @param {?} allPostStyleElements
+ * @return {?}
+ */
+function replacePostStylesAsPre(element, allPreStyleElements, allPostStyleElements) {
+    var /** @type {?} */ postEntry = allPostStyleElements.get(element);
+    if (!postEntry)
+        return false;
+    var /** @type {?} */ preEntry = allPreStyleElements.get(element);
+    if (preEntry) {
+        postEntry.forEach(function (data) { return ((preEntry)).add(data); });
+    }
+    else {
+        allPreStyleElements.set(element, postEntry);
+    }
+    allPostStyleElements.delete(element);
     return true;
 }
 /**
@@ -17754,9 +18530,9 @@ var WebAnimationsPlayer = (function () {
      */
     WebAnimationsPlayer.prototype.destroy = function () {
         if (!this._destroyed) {
+            this._destroyed = true;
             this._resetDomPlayerState();
             this._onFinish();
-            this._destroyed = true;
             this._onDestroyFns.forEach(function (fn) { return fn(); });
             this._onDestroyFns = [];
         }
@@ -17926,6 +18702,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NgLocalization", function() { return NgLocalization; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ɵparseCookieValue", function() { return parseCookieValue; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CommonModule", function() { return CommonModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeprecatedI18NPipesModule", function() { return DeprecatedI18NPipesModule; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NgClass", function() { return NgClass; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NgFor", function() { return NgFor; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NgForOf", function() { return NgForOf; });
@@ -17973,7 +18750,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ɵb", function() { return COMMON_PIPES; });
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -21839,6 +22616,30 @@ CommonModule.decorators = [
  */
 CommonModule.ctorParameters = function () { return []; };
 /**
+ * I18N pipes are being changed to move away from using the JS Intl API.
+ *
+ * The former pipes relying on the Intl API will be moved to this module while the `CommonModule`
+ * will contain the new pipes that do not rely on Intl.
+ *
+ * As a first step this module is created empty to ease the migration.
+ *
+ * see https://github.com/angular/angular/pull/18284
+ *
+ * @deprecated from v5
+ */
+var DeprecatedI18NPipesModule = (function () {
+    function DeprecatedI18NPipesModule() {
+    }
+    return DeprecatedI18NPipesModule;
+}());
+DeprecatedI18NPipesModule.decorators = [
+    { type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["NgModule"], args: [{ declarations: [], exports: [] },] },
+];
+/**
+ * @nocollapse
+ */
+DeprecatedI18NPipesModule.ctorParameters = function () { return []; };
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -21916,7 +22717,7 @@ function isPlatformWorkerUi(platformId) {
 /**
  * \@stable
  */
-var VERSION = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["Version"]('4.3.5');
+var VERSION = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["Version"]('4.3.6');
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -22000,7 +22801,7 @@ var VERSION = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["Version"]('4.3.5'
 /* unused harmony export ɵf */
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -24376,7 +25177,7 @@ HttpClientJsonpModule.ctorParameters = function () { return []; };
 /* unused harmony export removeSummaryDuplicates */
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -24396,7 +25197,7 @@ HttpClientJsonpModule.ctorParameters = function () { return []; };
 /**
  * \@stable
  */
-var VERSION = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["Version"]('4.3.5');
+var VERSION = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["Version"]('4.3.6');
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36698,7 +37499,7 @@ var BindingParser = (function () {
         // This will occur when a @trigger is not paired with an expression.
         // For animations it is valid to not have an expression since */void
         // states will be applied by angular when the element is attached/detached
-        var /** @type {?} */ ast = this._parseBinding(expression || 'null', false, sourceSpan);
+        var /** @type {?} */ ast = this._parseBinding(expression || 'undefined', false, sourceSpan);
         targetMatchableAttrs.push([name, /** @type {?} */ ((ast.source))]);
         targetProps.push(new BoundProperty(name, ast, BoundPropertyType.ANIMATION, sourceSpan));
     };
@@ -52224,7 +53025,7 @@ function _mergeArrays(parts) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ɵu", function() { return DebugContext; });
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -53020,7 +53821,7 @@ var Version = (function () {
 /**
  * \@stable
  */
-var VERSION = new Version('4.3.5');
+var VERSION = new Version('4.3.6');
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -56915,16 +57716,21 @@ var ApplicationRef_ = (function (_super) {
             });
         });
         var isStable = new __WEBPACK_IMPORTED_MODULE_1_rxjs_Observable__["Observable"](function (observer) {
-            var stableSub = _this._zone.onStable.subscribe(function () {
-                NgZone.assertNotInAngularZone();
-                // Check whether there are no pending macro/micro tasks in the next tick
-                // to allow for NgZone to update the state.
-                scheduleMicroTask(function () {
-                    if (!_this._stable && !_this._zone.hasPendingMacrotasks &&
-                        !_this._zone.hasPendingMicrotasks) {
-                        _this._stable = true;
-                        observer.next(true);
-                    }
+            // Create the subscription to onStable outside the Angular Zone so that
+            // the callback is run outside the Angular Zone.
+            var stableSub;
+            _this._zone.runOutsideAngular(function () {
+                stableSub = _this._zone.onStable.subscribe(function () {
+                    NgZone.assertNotInAngularZone();
+                    // Check whether there are no pending macro/micro tasks in the next tick
+                    // to allow for NgZone to update the state.
+                    scheduleMicroTask(function () {
+                        if (!_this._stable && !_this._zone.hasPendingMacrotasks &&
+                            !_this._zone.hasPendingMicrotasks) {
+                            _this._stable = true;
+                            observer.next(true);
+                        }
+                    });
                 });
             });
             var unstableSub = _this._zone.onUnstable.subscribe(function () {
@@ -63569,8 +64375,13 @@ function calcQueryValues(view, startIndex, endIndex, queryDef, values) {
         if (nodeDef.flags & 1 /* TypeElement */ && ((nodeDef.element)).template &&
             (((((nodeDef.element)).template)).nodeMatchedQueries & queryDef.filterId) ===
                 queryDef.filterId) {
-            // check embedded views that were attached at the place of their template.
             var /** @type {?} */ elementData = asElementData(view, i);
+            // check embedded views that were attached at the place of their template,
+            // but process child nodes first if some match the query (see issue #16568)
+            if ((nodeDef.childMatchedQueries & queryDef.filterId) === queryDef.filterId) {
+                calcQueryValues(view, i + 1, i + nodeDef.childCount, queryDef, values);
+                i += nodeDef.childCount;
+            }
             if (nodeDef.flags & 16777216 /* EmbeddedViews */) {
                 var /** @type {?} */ embeddedViews = ((elementData.viewContainer))._embeddedViews;
                 for (var /** @type {?} */ k = 0; k < embeddedViews.length; k++) {
@@ -66125,11 +66936,12 @@ var NgModuleFactory_ = (function (_super) {
  * <div [\@myAnimationTrigger]="myStatusExp">...</div>
  * ```
  *
- * ## Disable Child Animations
+ * ## Disable Animations
  * A special animation control binding called `\@.disabled` can be placed on an element which will
- * then disable animations for any inner animation triggers situated within the element.
+ * then disable animations for any inner animation triggers situated within the element as well as
+ * any animations on the element itself.
  *
- * When true, the `\@.disabled` binding will prevent inner animations from rendering. The example
+ * When true, the `\@.disabled` binding will prevent all animations from rendering. The example
  * below shows how to use this feature:
  *
  * ```ts
@@ -66155,8 +66967,8 @@ var NgModuleFactory_ = (function (_super) {
  * The `\@childAnimation` trigger will not animate because `\@.disabled` prevents it from happening
  * (when true).
  *
- * Note that `\@.disbled` will only disable inner animations (any animations running on the same
- * element will not be disabled).
+ * Note that `\@.disbled` will only disable all animations (this means any animations running on
+ * the same element will also be disabled).
  *
  * ### Disabling Animations Application-wide
  * When an area of the template is set to have animations disabled, **all** inner components will
@@ -67114,7 +67926,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ɵr", function() { return REQUIRED_VALIDATOR; });
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -73038,7 +73850,7 @@ FormBuilder.ctorParameters = function () { return []; };
 /**
  * \@stable
  */
-var VERSION = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["Version"]('4.3.5');
+var VERSION = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["Version"]('4.3.6');
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -73223,7 +74035,7 @@ ReactiveFormsModule.ctorParameters = function () { return []; };
 /* unused harmony export ɵResourceLoaderImpl */
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -73292,7 +74104,7 @@ ResourceLoaderImpl.ctorParameters = function () { return []; };
  * found in the LICENSE file at https://angular.io/license
  */
 var INTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS = [
-    __WEBPACK_IMPORTED_MODULE_4__angular_platform_browser__["e" /* ɵINTERNAL_BROWSER_PLATFORM_PROVIDERS */],
+    __WEBPACK_IMPORTED_MODULE_4__angular_platform_browser__["f" /* ɵINTERNAL_BROWSER_PLATFORM_PROVIDERS */],
     {
         provide: __WEBPACK_IMPORTED_MODULE_2__angular_core__["COMPILER_OPTIONS"],
         useValue: { providers: [{ provide: __WEBPACK_IMPORTED_MODULE_1__angular_compiler__["a" /* ResourceLoader */], useClass: ResourceLoaderImpl }] },
@@ -73356,7 +74168,7 @@ var CachedResourceLoader = (function (_super) {
 /**
  * @stable
  */
-var VERSION = new __WEBPACK_IMPORTED_MODULE_2__angular_core__["Version"]('4.3.5');
+var VERSION = new __WEBPACK_IMPORTED_MODULE_2__angular_core__["Version"]('4.3.6');
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -73406,15 +74218,15 @@ var platformBrowserDynamic = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__
 /* unused harmony export enableDebugTools */
 /* unused harmony export By */
 /* unused harmony export NgProbeToken */
-/* unused harmony export DOCUMENT */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return DOCUMENT$1; });
 /* unused harmony export EVENT_MANAGER_PLUGINS */
 /* unused harmony export EventManager */
 /* unused harmony export HAMMER_GESTURE_CONFIG */
 /* unused harmony export HammerGestureConfig */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return DomSanitizer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return DomSanitizer; });
 /* unused harmony export VERSION */
 /* unused harmony export ɵBROWSER_SANITIZATION_PROVIDERS */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return INTERNAL_BROWSER_PLATFORM_PROVIDERS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return INTERNAL_BROWSER_PLATFORM_PROVIDERS; });
 /* unused harmony export ɵinitDomAdapter */
 /* unused harmony export ɵBrowserDomAdapter */
 /* unused harmony export ɵBrowserPlatformLocation */
@@ -73424,7 +74236,7 @@ var platformBrowserDynamic = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__
 /* unused harmony export ɵDomAdapter */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getDOM; });
 /* unused harmony export ɵsetRootDomAdapter */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return DomRendererFactory2; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return DomRendererFactory2; });
 /* unused harmony export ɵNAMESPACE_URIS */
 /* unused harmony export ɵflattenStyles */
 /* unused harmony export ɵshimContentAttribute */
@@ -73444,7 +74256,7 @@ var platformBrowserDynamic = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__
 /* unused harmony export ɵe */
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -77851,7 +78663,7 @@ var By = (function () {
 /**
  * \@stable
  */
-var VERSION = new __WEBPACK_IMPORTED_MODULE_2__angular_core__["Version"]('4.3.5');
+var VERSION = new __WEBPACK_IMPORTED_MODULE_2__angular_core__["Version"]('4.3.6');
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -77905,7 +78717,7 @@ var VERSION = new __WEBPACK_IMPORTED_MODULE_2__angular_core__["Version"]('4.3.5'
 /* unused harmony export ɵc */
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -77924,8 +78736,9 @@ var BrowserAnimationBuilder = (function (_super) {
     __WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __extends */](BrowserAnimationBuilder, _super);
     /**
      * @param {?} rootRenderer
+     * @param {?} doc
      */
-    function BrowserAnimationBuilder(rootRenderer) {
+    function BrowserAnimationBuilder(rootRenderer, doc) {
         var _this = _super.call(this) || this;
         _this._nextAnimationId = 0;
         var typeData = {
@@ -77934,7 +78747,7 @@ var BrowserAnimationBuilder = (function (_super) {
             styles: [],
             data: { animation: [] }
         };
-        _this._renderer = rootRenderer.createRenderer(document.body, typeData);
+        _this._renderer = rootRenderer.createRenderer(doc.body, typeData);
         return _this;
     }
     /**
@@ -77958,6 +78771,7 @@ BrowserAnimationBuilder.decorators = [
  */
 BrowserAnimationBuilder.ctorParameters = function () { return [
     { type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["RendererFactory2"], },
+    { type: undefined, decorators: [{ type: __WEBPACK_IMPORTED_MODULE_1__angular_core__["Inject"], args: [__WEBPACK_IMPORTED_MODULE_2__angular_platform_browser__["c" /* DOCUMENT */],] },] },
 ]; };
 var BrowserAnimationFactory = (function (_super) {
     __WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __extends */](BrowserAnimationFactory, _super);
@@ -78426,7 +79240,8 @@ var AnimationRenderer = (function (_super) {
     AnimationRenderer.prototype.setProperty = function (el, name, value) {
         if (name.charAt(0) == ANIMATION_PREFIX) {
             if (name.charAt(1) == '.' && name == DISABLE_ANIMATIONS_FLAG) {
-                this.disableAnimations(el, !!value);
+                value = value === undefined ? true : !!value;
+                this.disableAnimations(el, /** @type {?} */ (value));
             }
             else {
                 this.engine.process(this.namespaceId, el, name.substr(1), value);
@@ -78547,7 +79362,7 @@ var SHARED_ANIMATION_PROVIDERS = [
     { provide: __WEBPACK_IMPORTED_MODULE_4__angular_animations_browser__["a" /* ɵAnimationEngine */], useClass: InjectableAnimationEngine }, {
         provide: __WEBPACK_IMPORTED_MODULE_1__angular_core__["RendererFactory2"],
         useFactory: instantiateRendererFactory,
-        deps: [__WEBPACK_IMPORTED_MODULE_2__angular_platform_browser__["c" /* ɵDomRendererFactory2 */], __WEBPACK_IMPORTED_MODULE_4__angular_animations_browser__["a" /* ɵAnimationEngine */], __WEBPACK_IMPORTED_MODULE_1__angular_core__["NgZone"]]
+        deps: [__WEBPACK_IMPORTED_MODULE_2__angular_platform_browser__["d" /* ɵDomRendererFactory2 */], __WEBPACK_IMPORTED_MODULE_4__angular_animations_browser__["a" /* ɵAnimationEngine */], __WEBPACK_IMPORTED_MODULE_1__angular_core__["NgZone"]]
     }
 ];
 /**
@@ -78746,7 +79561,7 @@ NoopAnimationsModule.ctorParameters = function () { return []; };
 /* unused harmony export ɵl */
 
 /**
- * @license Angular v4.3.5
+ * @license Angular v4.3.6
  * (c) 2010-2017 Google, Inc. https://angular.io/
  * License: MIT
  */
@@ -84999,7 +85814,7 @@ function provideRouterInitializer() {
 /**
  * \@stable
  */
-var VERSION = new __WEBPACK_IMPORTED_MODULE_2__angular_core__["Version"]('4.3.5');
+var VERSION = new __WEBPACK_IMPORTED_MODULE_2__angular_core__["Version"]('4.3.6');
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

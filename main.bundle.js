@@ -45,16 +45,18 @@ var GlobalObject = {
             }
         }
     },
-    // Say NO! to copypast!
+    // Preventing many-many copypast
     contentName: {
         affiche: 'affiche',
         project: 'project',
-        fools: 'fools',
+        fools: 'fool',
+        choreography: 'choreography'
     },
     contentsName: {
         affiche: 'affiches',
         project: 'projects',
-        fools: 'foolses',
+        fools: 'fools',
+        choreography: 'choreographies'
     },
     texts: {
         affiche: {
@@ -65,7 +67,14 @@ var GlobalObject = {
         },
         fools: {
             changeWhat: 'человека'
+        },
+        choreography: {
+            changeWhat: 'человека'
         }
+    },
+    mutliselectBoxTexts: {
+        checkedPlural: 'выбрано',
+        defaultTitle: 'Выберите стиль(и)'
     }
 };
 //# sourceMappingURL=GlobalObject.js.map
@@ -173,6 +182,193 @@ AddAfficheComponent = __decorate([
 
 var _a, _b, _c, _d;
 //# sourceMappingURL=add-affiche.component.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/admin/add-choreography/add-choreography.component.scss":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".styles-select /deep/.btn {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0; }\n\n.dropdown-toggle::after {\n  display: none; }\n\n.styles-settings-button {\n  border-left: 1px solid black; }\n\n.styles-settings-content {\n  left: -100px !important;\n  padding: 15px;\n  width: 500px; }\n  .styles-settings-content .settings-style-change-box {\n    width: 160px; }\n    .styles-settings-content .settings-style-change-box /deep/.settings-style-change-box-button {\n      width: 160px; }\n", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
+/***/ "../../../../../src/app/admin/add-choreography/add-choreography.component.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common_http__ = __webpack_require__("../../../common/@angular/common/http.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_login_service__ = __webpack_require__("../../../../../src/app/services/login.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__ = __webpack_require__("../../../../../src/app/Globals/GlobalObject.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__base_add_object_base_class__ = __webpack_require__("../../../../../src/app/admin/base/add-object.base.class.ts");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AddChoreographyComponent; });
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+
+var AddChoreographyComponent = (function (_super) {
+    __extends(AddChoreographyComponent, _super);
+    function AddChoreographyComponent(route, router, http, loginService) {
+        var _this = _super.call(this, route, router, http, loginService) || this;
+        _this.route = route;
+        _this.router = router;
+        _this.http = http;
+        _this.loginService = loginService;
+        // 'Meta' data
+        _this.contentName = __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__["a" /* GlobalObject */].contentName['choreography'];
+        _this.contentsName = __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__["a" /* GlobalObject */].contentsName['choreography'];
+        _this.texts = __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__["a" /* GlobalObject */].texts['choreography'];
+        // Multiselect box settings/texts
+        _this.multiselectBoxTexts = __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__["a" /* GlobalObject */].mutliselectBoxTexts;
+        _this.multiselectBoxSettings = {
+            buttonClasses: 'btn btn-info',
+            itemClasses: ''
+        };
+        _this.multiselectBoxTextsSolo = {
+            defaultTitle: 'Выберите стиль'
+        };
+        _this.multiselectBoxSettingsSolo = {
+            buttonClasses: 'btn btn-info settings-style-change-box-button',
+            itemClasses: '',
+            selectionLimit: 1,
+            autoUnselect: true,
+            closeOnSelect: true
+        };
+        _this.selectedStylesPreviewModel = [];
+        // Styles for delete
+        _this.stylesForDeleteModel = [];
+        // Style for change
+        _this.styleForChangeModel = [];
+        _this.callbacks.push(function () {
+            // Получить стили
+            _this.getStyles(function () {
+                // "Вытянуть" из стилей преподавателя только массив id
+                var selectedStyles = [];
+                for (var i = 0; i < _this.obj.styles.length; i++)
+                    selectedStyles.push(_this.obj.styles[i].id);
+                _this.obj.styleIds = selectedStyles;
+                _this.styleSelected();
+                // Удалить поле styles из obj (теперь у нас есть styleIds)
+                delete _this.obj.styles;
+            });
+        });
+        return _this;
+    }
+    // Get all possible styles from server
+    AddChoreographyComponent.prototype.getStyles = function (callback) {
+        var _this = this;
+        this.http.get(__WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/api/styles').subscribe(function (data) {
+            console.log(data['message']);
+            _this.styles = data['data'];
+            callback && callback();
+        });
+    };
+    AddChoreographyComponent.prototype.styleSelected = function () {
+        // Преобразовать массив выбранных стилей в массив, отправляемый в предпросмотр (если включено)
+        this.selectedStylesPreviewModel = [];
+        for (var i = 0; i < this.obj.styleIds.length; i++)
+            for (var j = 0; j < this.styles.length; j++)
+                if (this.styles[j].id == this.obj.styleIds[i]) {
+                    this.selectedStylesPreviewModel.push(this.styles[j]);
+                    break;
+                }
+    };
+    // Styles settings function
+    AddChoreographyComponent.prototype.addStyle = function (styleName) {
+        var _this = this;
+        if (!styleName) {
+            alert('Введите имя стиля');
+            return;
+        }
+        this.http.post('/api/admin/styles', { name: styleName }).subscribe(function (data) {
+            if (data['state'] === 'success')
+                alert('Добавлено');
+            else
+                alert('Ошибка');
+            // Получить обновлённые стили
+            _this.getStyles();
+        });
+    };
+    AddChoreographyComponent.prototype.deleteStyles = function () {
+        var _this = this;
+        if (this.stylesForDeleteModel.length == 0) {
+            alert('Выберите хотя бы один стиль');
+            return;
+        }
+        this.http.delete('/api/admin/styles', this.stylesForDeleteModel).subscribe(function (data) {
+            if (data['state'] === 'success')
+                alert('Удалено');
+            else
+                alert('Ошибка');
+            // Получить обновлённые стили
+            _this.getStyles();
+        });
+    };
+    AddChoreographyComponent.prototype.changeStyle = function (styleName) {
+        var _this = this;
+        if (this.styleForChangeModel.length != 1) {
+            alert('Выберите стиль');
+            return;
+        }
+        if (!styleName) {
+            alert('Введите новое имя стиля');
+            return;
+        }
+        this.http.put('/api/admin/styles', { id: this.styleForChangeModel[0], name: styleName }).subscribe(function (data) {
+            if (data['state'] === 'success')
+                alert('Изменено');
+            else
+                alert('Ошибка');
+            // Получить обновлённые стили
+            _this.getStyles();
+        });
+    };
+    return AddChoreographyComponent;
+}(__WEBPACK_IMPORTED_MODULE_5__base_add_object_base_class__["a" /* AddObjectComponent */]));
+AddChoreographyComponent = __decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+        selector: 'app-add-choreography',
+        template: __webpack_require__("../../../../../src/app/admin/base/add-object.base.template.html"),
+        styles: [__webpack_require__("../../../../../src/app/admin/add-choreography/add-choreography.component.scss")]
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* ActivatedRoute */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* ActivatedRoute */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["c" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["c" /* Router */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["b" /* HttpClient */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["b" /* HttpClient */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_login_service__["a" /* LoginService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_login_service__["a" /* LoginService */]) === "function" && _d || Object])
+], AddChoreographyComponent);
+
+var _a, _b, _c, _d;
+//# sourceMappingURL=add-choreography.component.js.map
 
 /***/ }),
 
@@ -345,6 +541,7 @@ var _a;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Globals_GlobalObject__ = __webpack_require__("../../../../../src/app/Globals/GlobalObject.ts");
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AddObjectComponent; });
 
+;
 var AddObjectComponent = (function () {
     function AddObjectComponent(route, router, http, loginService) {
         var _this = this;
@@ -363,6 +560,10 @@ var AddObjectComponent = (function () {
             description: '',
             text: '',
         };
+        // Uploaded imgs model (sending them to server)
+        this.uploadedImgs = [
+            { id: 0, isUploadable: true, text: '...', isDeletable: false }
+        ];
         this.callbacks = [];
         this.route.params.subscribe(function (params) {
             _this.afficheId = params['id'];
@@ -427,6 +628,45 @@ var AddObjectComponent = (function () {
     AddObjectComponent.prototype.previewObject = function () {
         this.preview = !this.preview;
     };
+    // Imgs upload interface
+    // TODO: Отправить в параметрах файл, выгруженный в input type="file"
+    AddObjectComponent.prototype.uploadImg = function (uploadedImg, file) {
+        this.uploadedImgs.push({
+            id: this.uploadedImgs.length,
+            isUploadable: true,
+            text: '...',
+            isDeletable: false
+        });
+        uploadedImg.isUploadable = false;
+        // TODO: Запрос с картинкой в объекте через multipart/form-data
+        var formData = new FormData();
+        formData.append('file', file);
+        this.http.post(__WEBPACK_IMPORTED_MODULE_0__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/api/admin/img', formData).subscribe(function (data) {
+            console.log(data['message']);
+            if (data['state'] === 'success')
+                uploadedImg.text = __WEBPACK_IMPORTED_MODULE_0__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/' + data['link'].replace('\\', '/');
+            else {
+                uploadedImg.text = 'Error';
+            }
+            uploadedImg.isDeletable = true;
+        });
+    };
+    AddObjectComponent.prototype.copyImgLinkToClipboard = function (imgLinkInput) {
+        imgLinkInput.select();
+        document.execCommand('copy');
+    };
+    AddObjectComponent.prototype.deleteImg = function (uploadedImg) {
+        var _this = this;
+        // Запрос на удаление картинки (по её адресу)
+        this.http.delete(__WEBPACK_IMPORTED_MODULE_0__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/api/admin/img/' + encodeURIComponent(uploadedImg.text)).subscribe(function (data) {
+            console.log(data['message']);
+            for (var i = 0; i < _this.uploadedImgs.length; i++)
+                if (uploadedImg.id == _this.uploadedImgs[i].id) {
+                    //delete this.uploadedImgs[i];
+                    _this.uploadedImgs.splice(i, 1);
+                }
+        });
+    };
     return AddObjectComponent;
 }());
 
@@ -437,7 +677,7 @@ var AddObjectComponent = (function () {
 /***/ "../../../../../src/app/admin/base/add-object.base.template.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"preview\" class=\"add-affiche-preview-div\">\r\n    <div [ngSwitch]=\"contentName\">\r\n        <affiche *ngSwitchCase=\"'affiche'\"\r\n                [customTitle]=\"obj.title\" [customText]=\"obj.text\" [customDate]=\"obj.date | formatDateFromBootstrap\"></affiche>\r\n        <project *ngSwitchCase=\"'project'\"\r\n                [customTitle]=\"obj.title\" [customText]=\"obj.text\"></project>\r\n    </div>\r\n</div>\r\n\r\n<input [(ngModel)]=\"obj.title\" type=\"text\" class=\"form-control\" ngbTooltip=\"Заголовок\" placeholder=\"Заголовок\">\r\n<!-- Affiche only -->\r\n<!-- <input *ngIf=\"contentName === 'affiche'\" [value]=\"obj.date | date:'yyyy-MM-dd'\"\r\n        (input)=\"obj.date = $event.target.valueAsDate\" type=\"date\" class=\"form-control\" ngbTooltip=\"Дата события\"> -->\r\n<!-- Affiche only -->\r\n<div *ngIf=\"contentName === 'affiche'\" class=\"input-group\" ngbTooltip=\"Дата события\">\r\n    <input class=\"form-control\" placeholder=\"yyyy-mm-dd\"\r\n            name=\"dp\" [(ngModel)]=\"obj.date\" ngbDatepicker #d=\"ngbDatepicker\">\r\n    <button class=\"input-group-addon\" (click)=\"d.toggle()\" type=\"button\">\r\n        <img src=\"/assets/calendar-icon.svg\" style=\"width: 1.2rem; height: 1rem; cursor: pointer;\">\r\n    </button>\r\n</div>\r\n<input [(ngModel)]=\"obj.img\" type=\"text\" class=\"form-control\" ngbTooltip=\"Быстрое изображение\" placeholder=\"Ссылка на изображение\">\r\n<textarea [(ngModel)]=\"obj.description\" class=\"form-control\" ngbTooltip=\"Краткое описание\" placeholder=\"Краткое описание\"></textarea>\r\n<ckeditor [(ngModel)]=\"obj.text\"></ckeditor>\r\n\r\n<button *ngIf=\"!changeAffiche\" class=\"add-affiche-accept-button btn btn-success\" (click)=\"addObject()\">Добавить</button>\r\n<button *ngIf=\"changeAffiche\" class=\"add-affiche-accept-button btn btn-success\" (click)=\"addObject()\">Изменить</button>\r\n<button class=\"add-affiche-preview-button btn btn-info\" (click)=\"previewObject()\">Предпросмотр</button>\r\n"
+module.exports = "<div *ngIf=\"preview\" class=\"add-affiche-preview-div\">\r\n    <div [ngSwitch]=\"contentName\">\r\n        <affiche *ngSwitchCase=\"'affiche'\"\r\n                [customTitle]=\"obj.title\" [customText]=\"obj.text\" [customDate]=\"obj.date | formatDateFromBootstrap\"></affiche>\r\n        <project *ngSwitchCase=\"'project'\"\r\n                [customTitle]=\"obj.title\" [customText]=\"obj.text\"></project>\r\n        <choreography *ngSwitchCase=\"'choreography'\"\r\n                [customTitle]=\"obj.title\" [customText]=\"obj.text\" [customStyles]=\"selectedStylesPreviewModel\"></choreography>\r\n    </div>\r\n</div>\r\n\r\n<input [(ngModel)]=\"obj.title\" type=\"text\" class=\"form-control\" ngbTooltip=\"Заголовок\" placeholder=\"Заголовок\">\r\n<!-- Affiche only -->\r\n<div *ngIf=\"contentName === 'affiche'\" class=\"input-group add-object-margin-top\" ngbTooltip=\"Дата события\">\r\n    <input class=\"form-control\" placeholder=\"yyyy-mm-dd\"\r\n            name=\"dp\" [(ngModel)]=\"obj.date\" ngbDatepicker #d=\"ngbDatepicker\">\r\n    <button class=\"input-group-addon\" (click)=\"d.toggle()\" type=\"button\">\r\n        <img src=\"/assets/calendar-icon.svg\" style=\"width: 1.2rem; height: 1rem; cursor: pointer;\">\r\n    </button>\r\n</div>\r\n<!-- Choreography only -->\r\n<div *ngIf=\"contentName === 'choreography'\">\r\n    <!-- Multiselect box со стилями и кнопка их настройки -->\r\n    <div class=\"input-group add-object-margin-top\">\r\n        <span class=\"input-group-btn\" ngbTooltip=\"Стили преподавателя\">\r\n            <ss-multiselect-dropdown class=\"styles-select\" [options]=\"styles\" [(ngModel)]=\"obj.styleIds\"\r\n                    [texts]=\"multiselectBoxTexts\" [settings]=\"multiselectBoxSettings\"\r\n                    (ngModelChange)=\"styleSelected()\"></ss-multiselect-dropdown>\r\n        </span>\r\n        <span class=\"input-group-btn\" ngbDropdown autoClose=\"outside\"> <!-- autoClose=\"false\" -->\r\n            <!-- Кнопка открытия настроек стилей -->\r\n            <button id=\"stylesSettingsToggle\" class=\"btn btn-info styles-settings-button\" type=\"button\" ngbDropdownToggle>\r\n                <img src=\"/assets/settings-icon.svg\" style=\"width: 1.2rem; height: 1rem; cursor: pointer;\">\r\n            </button>\r\n            <!-- Панель настроек стилей -->\r\n            <div class=\"styles-settings-content\" ngbDropdownMenu aria-labelledby=\"stylesSettingsToggle\">\r\n                <!-- Добавление -->\r\n                <div class=\"input-group\" ngbTooltip=\"Добавить стиль\">\r\n                    <input #addStyleInput class=\"form-control\" type=\"text\" placeholder=\"Имя нового стиля\">\r\n                    <span class=\"input-group-btn\">\r\n                        <button class=\"btn btn-success\" (click)=\"addStyle(addStyleInput.value)\">Добавить</button>\r\n                    </span>\r\n                </div>\r\n                <!-- Удаление -->\r\n                <div class=\"input-group add-object-margin-top\" ngbTooltip=\"Удалить стиль\">\r\n                    <ss-multiselect-dropdown class=\"styles-select\" [options]=\"styles\" [(ngModel)]=\"stylesForDeleteModel\"\r\n                            [texts]=\"multiselectBoxTexts\" [settings]=\"multiselectBoxSettings\"></ss-multiselect-dropdown>\r\n                    <span class=\"input-group-btn\">\r\n                        <button class=\"btn btn-danger\" (click)=\"deleteStyles()\">Удалить</button>\r\n                    </span>\r\n                </div>\r\n                <!-- Изменение -->\r\n                <div class=\"input-group add-object-margin-top\" ngbTooltip=\"Изменить стиль\">\r\n                    <ss-multiselect-dropdown class=\"styles-select settings-style-change-box\" [options]=\"styles\"\r\n                            [(ngModel)]=\"styleForChangeModel\" [texts]=\"multiselectBoxTextsSolo\"\r\n                            [settings]=\"multiselectBoxSettingsSolo\"></ss-multiselect-dropdown>\r\n                    <input #changeStyleInput class=\"form-control\" type=\"text\" placeholder=\"Новое имя стиля\">\r\n                    <span class=\"input-group-btn\">\r\n                        <button class=\"btn btn-info\" (click)=\"changeStyle(changeStyleInput.value)\">Изменить</button>\r\n                    </span>\r\n                </div>\r\n            </div>\r\n        </span>\r\n    </div>\r\n</div>\r\n<input [(ngModel)]=\"obj.img\" type=\"text\" class=\"form-control add-object-margin-top\"\r\n        ngbTooltip=\"Быстрое изображение\" placeholder=\"Ссылка на изображение\">\r\n<textarea [(ngModel)]=\"obj.description\" class=\"form-control add-object-margin-top add-object-margin-bottom\"\r\n        ngbTooltip=\"Краткое описание\" placeholder=\"Краткое описание\"></textarea>\r\n<ckeditor [(ngModel)]=\"obj.text\"></ckeditor>\r\n\r\n<!-- \"Добавить\" -->\r\n<button *ngIf=\"!changeAffiche\" class=\"add-affiche-accept-button btn btn-success add-object-margin-top\"\r\n        (click)=\"addObject()\">Добавить</button>\r\n<!-- \"Изменить\" -->        \r\n<button *ngIf=\"changeAffiche\" class=\"add-affiche-accept-button btn btn-success add-object-margin-top\"\r\n        (click)=\"addObject()\">Изменить</button>\r\n<!-- \"Предпросмотр\" -->\r\n<button class=\"add-affiche-preview-button btn btn-info add-object-margin-top\"\r\n        (click)=\"previewObject()\">Предпросмотр</button>\r\n\r\n<!-- Images uploading -->\r\n<div *ngFor=\"let img of uploadedImgs\" class=\"input-group add-object-margin-top\"\r\n        [ngbTooltip]=\"img.isDeletable ? imgInTooltip : false\">\r\n    <!-- Кнопка активирует input.click(). Далее файл обрабатывается в change самого инпута -->\r\n    <span class=\"input-group-btn\">\r\n        <button class=\"btn btn-success\" (click)=\"imgFileInput.click()\" [disabled]=\"!img.isUploadable\">Загрузить</button>\r\n    </span>\r\n    <!-- Скрытый инпут (type=\"file\") -->\r\n    <input #imgFileInput class=\"hidden-file-input\" type=\"file\" (change)=\"uploadImg(img, $event.target.files[0])\">\r\n    <!-- Скопировать ссылку в буфер обмена -->\r\n    <span class=\"input-group-btn\">\r\n        <button class=\"btn btn-info\" (click)=\"copyImgLinkToClipboard(imgLinkInput)\"\r\n                [disabled]=\"!img.isDeletable\">Скопировать</button>\r\n    </span>\r\n    <ng-template #imgInTooltip><img src=\"{{img.text}}\" class=\"img-in-tooltip\"></ng-template>\r\n    <input #imgLinkInput class=\"form-control\" type=\"text\" value=\"{{img.text}}\">\r\n    <span class=\"input-group-btn\">\r\n        <button class=\"btn btn-danger\" (click)=\"deleteImg(img)\" [disabled]=\"!img.isDeletable\">Удалить</button>\r\n    </span>\r\n</div>\r\n"
 
 /***/ }),
 
@@ -449,11 +689,14 @@ module.exports = "<div *ngIf=\"preview\" class=\"add-affiche-preview-div\">\r\n 
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__content_affiches_affiches_component__ = __webpack_require__("../../../../../src/app/content/affiches/affiches.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__content_projects_projects_component__ = __webpack_require__("../../../../../src/app/content/projects/projects.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__content_affiche_affiche_component__ = __webpack_require__("../../../../../src/app/content/affiche/affiche.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__content_project_project_component__ = __webpack_require__("../../../../../src/app/content/project/project.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__admin_admin_component__ = __webpack_require__("../../../../../src/app/admin/admin.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__admin_add_affiche_add_affiche_component__ = __webpack_require__("../../../../../src/app/admin/add-affiche/add-affiche.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__admin_add_project_add_project_component__ = __webpack_require__("../../../../../src/app/admin/add-project/add-project.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__content_choreographies_choreographies_component__ = __webpack_require__("../../../../../src/app/content/choreographies/choreographies.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__content_affiche_affiche_component__ = __webpack_require__("../../../../../src/app/content/affiche/affiche.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__content_project_project_component__ = __webpack_require__("../../../../../src/app/content/project/project.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__content_choreography_choreography_component__ = __webpack_require__("../../../../../src/app/content/choreography/choreography.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__admin_admin_component__ = __webpack_require__("../../../../../src/app/admin/admin.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__admin_add_affiche_add_affiche_component__ = __webpack_require__("../../../../../src/app/admin/add-affiche/add-affiche.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__admin_add_project_add_project_component__ = __webpack_require__("../../../../../src/app/admin/add-project/add-project.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__admin_add_choreography_add_choreography_component__ = __webpack_require__("../../../../../src/app/admin/add-choreography/add-choreography.component.ts");
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppRoutingModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -470,6 +713,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
+
+
+
 var routes = [
     { path: '', redirectTo: '/affiches', pathMatch: 'full' },
     { path: 'affiches', component: __WEBPACK_IMPORTED_MODULE_2__content_affiches_affiches_component__["a" /* AffichesComponent */] },
@@ -477,12 +723,14 @@ var routes = [
     { path: 'fools-funny-crew', component: __WEBPACK_IMPORTED_MODULE_3__content_projects_projects_component__["a" /* ProjectsComponent */] },
     { path: 'teploobmen', component: __WEBPACK_IMPORTED_MODULE_3__content_projects_projects_component__["a" /* ProjectsComponent */] },
     { path: 'detskaya-studiya-esteticheskogo-razvitiya', component: __WEBPACK_IMPORTED_MODULE_3__content_projects_projects_component__["a" /* ProjectsComponent */] },
-    { path: 'horeografiya', component: __WEBPACK_IMPORTED_MODULE_3__content_projects_projects_component__["a" /* ProjectsComponent */] },
-    { path: 'affiche/:id', component: __WEBPACK_IMPORTED_MODULE_4__content_affiche_affiche_component__["a" /* AfficheComponent */] },
-    { path: 'project/:id', component: __WEBPACK_IMPORTED_MODULE_5__content_project_project_component__["a" /* ProjectComponent */] },
-    { path: 'admin', component: __WEBPACK_IMPORTED_MODULE_6__admin_admin_component__["a" /* AdminComponent */] },
-    { path: 'admin/add-affiche/:id', component: __WEBPACK_IMPORTED_MODULE_7__admin_add_affiche_add_affiche_component__["a" /* AddAfficheComponent */] },
-    { path: 'admin/add-project/:id', component: __WEBPACK_IMPORTED_MODULE_8__admin_add_project_add_project_component__["a" /* AddProjectComponent */] },
+    { path: 'choreographies', component: __WEBPACK_IMPORTED_MODULE_4__content_choreographies_choreographies_component__["a" /* ChoreographiesComponent */] },
+    { path: 'affiche/:id', component: __WEBPACK_IMPORTED_MODULE_5__content_affiche_affiche_component__["a" /* AfficheComponent */] },
+    { path: 'project/:id', component: __WEBPACK_IMPORTED_MODULE_6__content_project_project_component__["a" /* ProjectComponent */] },
+    { path: 'choreography/:id', component: __WEBPACK_IMPORTED_MODULE_7__content_choreography_choreography_component__["a" /* ChoreographyComponent */] },
+    { path: 'admin', component: __WEBPACK_IMPORTED_MODULE_8__admin_admin_component__["a" /* AdminComponent */] },
+    { path: 'admin/add-affiche/:id', component: __WEBPACK_IMPORTED_MODULE_9__admin_add_affiche_add_affiche_component__["a" /* AddAfficheComponent */] },
+    { path: 'admin/add-project/:id', component: __WEBPACK_IMPORTED_MODULE_10__admin_add_project_add_project_component__["a" /* AddProjectComponent */] },
+    { path: 'admin/add-choreography/:id', component: __WEBPACK_IMPORTED_MODULE_11__admin_add_choreography_add_choreography_component__["a" /* AddChoreographyComponent */] },
     { path: '**', redirectTo: '/affiches' }
 ];
 var AppRoutingModule = (function () {
@@ -564,7 +812,7 @@ var AppComponent = (function () {
             { numb: 4, text: 'Теплообмен', link: 'teploobmen', routes: ['/teploobmen'], background: 1 },
             { numb: 5, text: 'Детская студия эстетического развития', link: 'detskaya-studiya-esteticheskogo-razvitiya',
                 routes: ['/detskaya-studiya-esteticheskogo-razvitiya'], background: 2 },
-            { numb: 6, text: 'Хореографическая школа', link: 'horeografiya', routes: ['/horeografiya'], background: 3 }
+            { numb: 6, text: 'Хореографическая школа', link: 'choreographies', routes: ['/choreographies', '/choreography/'], background: 3 }
         ];
         // This one changes when clicking on the menu item
         this.headerTitles = [
@@ -663,16 +911,20 @@ module.exports = module.exports.toString();
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_ng2_ckeditor__ = __webpack_require__("../../../../ng2-ckeditor/lib/index.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_ng2_ckeditor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_ng2_ckeditor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ng_bootstrap_ng_bootstrap__ = __webpack_require__("../../../../@ng-bootstrap/ng-bootstrap/index.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__app_component__ = __webpack_require__("../../../../../src/app/app.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__content_content_component__ = __webpack_require__("../../../../../src/app/content/content.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__content_affiche_affiche_component__ = __webpack_require__("../../../../../src/app/content/affiche/affiche.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__content_project_project_component__ = __webpack_require__("../../../../../src/app/content/project/project.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__content_affiches_affiches_component__ = __webpack_require__("../../../../../src/app/content/affiches/affiches.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__content_projects_projects_component__ = __webpack_require__("../../../../../src/app/content/projects/projects.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__content_teploobmen_teploobmen_component__ = __webpack_require__("../../../../../src/app/content/teploobmen/teploobmen.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__admin_admin_component__ = __webpack_require__("../../../../../src/app/admin/admin.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__admin_add_affiche_add_affiche_component__ = __webpack_require__("../../../../../src/app/admin/add-affiche/add-affiche.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__admin_add_project_add_project_component__ = __webpack_require__("../../../../../src/app/admin/add-project/add-project.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_angular_2_dropdown_multiselect__ = __webpack_require__("../../../../angular-2-dropdown-multiselect/index.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__app_component__ = __webpack_require__("../../../../../src/app/app.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__content_content_component__ = __webpack_require__("../../../../../src/app/content/content.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__content_affiche_affiche_component__ = __webpack_require__("../../../../../src/app/content/affiche/affiche.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__content_project_project_component__ = __webpack_require__("../../../../../src/app/content/project/project.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__content_affiches_affiches_component__ = __webpack_require__("../../../../../src/app/content/affiches/affiches.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__content_projects_projects_component__ = __webpack_require__("../../../../../src/app/content/projects/projects.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__content_teploobmen_teploobmen_component__ = __webpack_require__("../../../../../src/app/content/teploobmen/teploobmen.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__admin_admin_component__ = __webpack_require__("../../../../../src/app/admin/admin.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__admin_add_affiche_add_affiche_component__ = __webpack_require__("../../../../../src/app/admin/add-affiche/add-affiche.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__admin_add_project_add_project_component__ = __webpack_require__("../../../../../src/app/admin/add-project/add-project.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__content_choreography_choreography_component__ = __webpack_require__("../../../../../src/app/content/choreography/choreography.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__content_choreographies_choreographies_component__ = __webpack_require__("../../../../../src/app/content/choreographies/choreographies.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__admin_add_choreography_add_choreography_component__ = __webpack_require__("../../../../../src/app/admin/add-choreography/add-choreography.component.ts");
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -680,6 +932,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
+
+
+
 
 
 
@@ -710,16 +966,19 @@ AppModule = __decorate([
         declarations: [
             __WEBPACK_IMPORTED_MODULE_7__pipes__["a" /* SafeHtmlPipe */],
             __WEBPACK_IMPORTED_MODULE_7__pipes__["b" /* FormatDateFromBootstrap */],
-            __WEBPACK_IMPORTED_MODULE_10__app_component__["a" /* AppComponent */],
-            __WEBPACK_IMPORTED_MODULE_11__content_content_component__["a" /* ContentComponent */],
-            __WEBPACK_IMPORTED_MODULE_12__content_affiche_affiche_component__["a" /* AfficheComponent */],
-            __WEBPACK_IMPORTED_MODULE_13__content_project_project_component__["a" /* ProjectComponent */],
-            __WEBPACK_IMPORTED_MODULE_14__content_affiches_affiches_component__["a" /* AffichesComponent */],
-            __WEBPACK_IMPORTED_MODULE_15__content_projects_projects_component__["a" /* ProjectsComponent */],
-            __WEBPACK_IMPORTED_MODULE_16__content_teploobmen_teploobmen_component__["a" /* TeploobmenComponent */],
-            __WEBPACK_IMPORTED_MODULE_17__admin_admin_component__["a" /* AdminComponent */],
-            __WEBPACK_IMPORTED_MODULE_18__admin_add_affiche_add_affiche_component__["a" /* AddAfficheComponent */],
-            __WEBPACK_IMPORTED_MODULE_19__admin_add_project_add_project_component__["a" /* AddProjectComponent */]
+            __WEBPACK_IMPORTED_MODULE_11__app_component__["a" /* AppComponent */],
+            __WEBPACK_IMPORTED_MODULE_12__content_content_component__["a" /* ContentComponent */],
+            __WEBPACK_IMPORTED_MODULE_13__content_affiche_affiche_component__["a" /* AfficheComponent */],
+            __WEBPACK_IMPORTED_MODULE_14__content_project_project_component__["a" /* ProjectComponent */],
+            __WEBPACK_IMPORTED_MODULE_15__content_affiches_affiches_component__["a" /* AffichesComponent */],
+            __WEBPACK_IMPORTED_MODULE_16__content_projects_projects_component__["a" /* ProjectsComponent */],
+            __WEBPACK_IMPORTED_MODULE_17__content_teploobmen_teploobmen_component__["a" /* TeploobmenComponent */],
+            __WEBPACK_IMPORTED_MODULE_18__admin_admin_component__["a" /* AdminComponent */],
+            __WEBPACK_IMPORTED_MODULE_19__admin_add_affiche_add_affiche_component__["a" /* AddAfficheComponent */],
+            __WEBPACK_IMPORTED_MODULE_20__admin_add_project_add_project_component__["a" /* AddProjectComponent */],
+            __WEBPACK_IMPORTED_MODULE_21__content_choreography_choreography_component__["a" /* ChoreographyComponent */],
+            __WEBPACK_IMPORTED_MODULE_22__content_choreographies_choreographies_component__["a" /* ChoreographiesComponent */],
+            __WEBPACK_IMPORTED_MODULE_23__admin_add_choreography_add_choreography_component__["a" /* AddChoreographyComponent */]
         ],
         imports: [
             __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
@@ -728,12 +987,13 @@ AppModule = __decorate([
             __WEBPACK_IMPORTED_MODULE_3__angular_forms__["FormsModule"],
             __WEBPACK_IMPORTED_MODULE_5__app_routing_module__["a" /* AppRoutingModule */],
             __WEBPACK_IMPORTED_MODULE_8_ng2_ckeditor__["CKEditorModule"],
+            __WEBPACK_IMPORTED_MODULE_10_angular_2_dropdown_multiselect__["a" /* MultiselectDropdownModule */],
             __WEBPACK_IMPORTED_MODULE_9__ng_bootstrap_ng_bootstrap__["a" /* NgbModule */].forRoot()
         ],
         providers: [
             __WEBPACK_IMPORTED_MODULE_6__services_login_service__["a" /* LoginService */]
         ],
-        bootstrap: [__WEBPACK_IMPORTED_MODULE_10__app_component__["a" /* AppComponent */]]
+        bootstrap: [__WEBPACK_IMPORTED_MODULE_11__app_component__["a" /* AppComponent */]]
     })
 ], AppModule);
 
@@ -809,6 +1069,7 @@ var AfficheComponent = (function (_super) {
         _this.texts = __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__["a" /* GlobalObject */].texts['affiche'];
         // Будут выполнены после загрузки компонента (в конце ngOnInit)
         _this.callbacks.push(function () {
+            // Преобразование даты к понятному пользователю виду
             var date = new Date(_this.obj.date), month = '' + (date.getMonth() + 1), day = '' + date.getDate(), year = date.getFullYear();
             if (month.length < 2)
                 month = '0' + month;
@@ -1000,7 +1261,7 @@ __decorate([
 /***/ "../../../../../src/app/content/base/content.base.template.html":
 /***/ (function(module, exports) {
 
-module.exports = "<!-- Admin panel -->\r\n<div *ngIf=\"!customObject && loginService.username !== null\" class=\"admin-panel-wrapper\">\r\n    <div class=\"admin-panel-title\">Админка</div>\r\n    <div class=\"admin-panel-add-button\" [routerLink]=\"['/admin/add-' + contentName, id]\">Изменить {{texts.changeWhat}}</div>\r\n    <div class=\"admin-panel-add-button\" (click)=deleteObject()>Удалить {{texts.changeWhat}}</div>\r\n</div>\r\n\r\n<!-- Object (affiche, project, etc.) -->\r\n<div class=\"object-wrapper\">\r\n    <!-- Affiche only -->\r\n    <div *ngIf=\"contentName === 'affiche'\" class=\"affiche-date\">\r\n        Дата события: {{customObject ? customDate : obj.date}}\r\n    </div>\r\n    <div class=\"object-title\" [innerHTML]=\"(customObject ? customTitle : obj.title) | safeHtml\"></div>\r\n    <div class=\"object-text\" [innerHTML]=\"(customObject ? customText : obj.text) | safeHtml\"></div>\r\n</div>\r\n"
+module.exports = "<!-- Admin panel -->\r\n<div *ngIf=\"!customObject && loginService.username !== null\" class=\"admin-panel-wrapper\">\r\n    <div class=\"admin-panel-title\">Админка</div>\r\n    <div class=\"admin-panel-add-button\" [routerLink]=\"['/admin/add-' + contentName, id]\">Изменить {{texts.changeWhat}}</div>\r\n    <div class=\"admin-panel-add-button\" (click)=deleteObject()>Удалить {{texts.changeWhat}}</div>\r\n</div>\r\n\r\n<!-- Object (affiche, project, etc.) -->\r\n<div class=\"object-wrapper\">\r\n    <!-- Affiche only -->\r\n    <div *ngIf=\"contentName === 'affiche'\" class=\"affiche-date\">\r\n        Дата события: {{customObject ? customDate : obj.date}}\r\n    </div>\r\n    <!-- Choreography only -->\r\n    <div *ngIf=\"contentName === 'choreography'\" class=\"choreography-styles\">\r\n        Стили преподавателя:\r\n        <span *ngFor=\"let style of (customObject ? customStyles : obj.styles)\">\r\n            {{style.name}}\r\n        </span>\r\n    </div>\r\n    <div class=\"object-title\" [innerHTML]=\"(customObject ? customTitle : obj.title) | safeHtml\"></div>\r\n    <div class=\"object-text\" [innerHTML]=\"(customObject ? customText : obj.text) | safeHtml\"></div>\r\n</div>\r\n"
 
 /***/ }),
 
@@ -1042,7 +1303,195 @@ var ContentsBaseClass = (function () {
 /***/ "../../../../../src/app/content/base/contents.base.template.html":
 /***/ (function(module, exports) {
 
-module.exports = "<!-- Admin panel -->\r\n<div *ngIf=\"loginService.username !== null\" class=\"admin-panel-wrapper\">\r\n    <div class=\"admin-panel-title\">Админка</div>\r\n    <div class=\"admin-panel-add-button\" [routerLink]=\"['/admin/add-' + contentName, '']\">Добавить {{texts.changeWhat}}</div>\r\n</div>\r\n\r\n<!-- Objects list -->\r\n<div class=\"objects-previews-wrapper\">\r\n    <div *ngFor=\"let object of objects\" class=\"objects-preview-wrapper-wrap\">\r\n        <div class=\"objects-preview-wrapper\" [routerLink]=\"['/' + contentName + '/' + object.link]\">\r\n            <img src=\"{{ object.img }}\" class=\"objects-preview-img\">\r\n            <div class=\"objects-preview-title\">{{ object.title }}</div>\r\n            <div class=\"objects-preview-description\">{{ object.description }}</div>\r\n        </div>\r\n        <div class=\"hr\"></div>\r\n    </div>\r\n</div>\r\n"
+module.exports = "<!-- Admin panel -->\r\n<div *ngIf=\"loginService.username !== null\" class=\"admin-panel-wrapper\">\r\n    <div class=\"admin-panel-title\">Админка</div>\r\n    <div class=\"admin-panel-add-button\" [routerLink]=\"['/admin/add-' + contentName, '']\">Добавить {{texts.changeWhat}}</div>\r\n</div>\r\n\r\n<!-- Choreography only -->\r\n<div *ngIf=\"contentName === 'choreography'\" class=\"styles-select-wrapper\">\r\n    <ss-multiselect-dropdown class=\"styles-select\" [options]=\"styles\" [(ngModel)]=\"selectedStyles\"\r\n            (ngModelChange)=\"stylesSelected()\" [texts]=\"multiselectBoxTexts\" [settings]='multiselectBoxSettings'\r\n            ngbTooltip=\"Фильтр по стилям\"></ss-multiselect-dropdown>\r\n</div>\r\n\r\n<!-- Objects list -->\r\n<div class=\"objects-previews-wrapper\">\r\n    <div *ngFor=\"let object of objects\" class=\"objects-preview-wrapper-wrap\">\r\n        <div class=\"objects-preview-wrapper\" [routerLink]=\"['/' + contentName + '/' + object.link]\">\r\n            <!-- Choreography only -->\r\n            <div *ngIf=\"contentName === 'choreography'\">\r\n                <div class=\"objects-preview-styles-wrapper add-object-margin-bottom\">\r\n                    <div *ngFor=\"let style of object.styles\"\r\n                            class=\"objects-preview-style badge badge-info\">\r\n                        {{ style.name }}\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <img src=\"{{ object.img }}\" class=\"objects-preview-img\">\r\n            <div class=\"objects-preview-title\">{{ object.title }}</div>\r\n            <div class=\"objects-preview-description\">{{ object.description }}</div>\r\n        </div>\r\n        <div class=\"hr\"></div>\r\n    </div>\r\n</div>\r\n"
+
+/***/ }),
+
+/***/ "../../../../../src/app/content/choreographies/choreographies.component.scss":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".styles-select-wrapper {\n  margin-bottom: 10px; }\n\n.styles-select /deep/.btn {\n  margin-top: -2px; }\n\n.objects-preview-styles-wrapper {\n  font-size: 0; }\n\n.objects-preview-style {\n  border: 1px solid black;\n  display: inline-block;\n  font-size: 12pt;\n  margin-right: 2px; }\n\n.objects-preview-style:last-child {\n  margin-right: 0; }\n", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
+/***/ "../../../../../src/app/content/choreographies/choreographies.component.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common_http__ = __webpack_require__("../../../common/@angular/common/http.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_login_service__ = __webpack_require__("../../../../../src/app/services/login.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Globals_GlobalObject__ = __webpack_require__("../../../../../src/app/Globals/GlobalObject.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__base_contents_base_class__ = __webpack_require__("../../../../../src/app/content/base/contents.base.class.ts");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ChoreographiesComponent; });
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+var ChoreographiesComponent = (function (_super) {
+    __extends(ChoreographiesComponent, _super);
+    function ChoreographiesComponent(http, loginService) {
+        var _this = _super.call(this, http, loginService) || this;
+        _this.http = http;
+        _this.loginService = loginService;
+        // 'Meta' data
+        _this.contentName = __WEBPACK_IMPORTED_MODULE_3__Globals_GlobalObject__["a" /* GlobalObject */].contentName['choreography'];
+        _this.contentsName = __WEBPACK_IMPORTED_MODULE_3__Globals_GlobalObject__["a" /* GlobalObject */].contentsName['choreography'];
+        _this.texts = __WEBPACK_IMPORTED_MODULE_3__Globals_GlobalObject__["a" /* GlobalObject */].texts['choreography'];
+        // Multiselect box settings/texts
+        _this.multiselectBoxTexts = __WEBPACK_IMPORTED_MODULE_3__Globals_GlobalObject__["a" /* GlobalObject */].mutliselectBoxTexts;
+        _this.multiselectBoxSettings = {
+            buttonClasses: 'btn btn-info'
+        };
+        _this.callbacks.push(function () {
+            // Get all possible styles from server
+            _this.http.get(__WEBPACK_IMPORTED_MODULE_3__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/api/styles').subscribe(function (data) {
+                console.log(data['message']);
+                _this.styles = data['data'];
+            });
+        });
+        return _this;
+    }
+    ChoreographiesComponent.prototype.stylesSelected = function () {
+        var _this = this;
+        // Получить список учителей с выбранными стилями
+        this.http.get(__WEBPACK_IMPORTED_MODULE_3__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/api/choreographies/' + this.selectedStyles.join(',')).subscribe(function (data) {
+            console.log(data['message']);
+            _this.objects = data['data'];
+        });
+    };
+    return ChoreographiesComponent;
+}(__WEBPACK_IMPORTED_MODULE_4__base_contents_base_class__["a" /* ContentsBaseClass */]));
+ChoreographiesComponent = __decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+        selector: 'choreographies',
+        template: __webpack_require__("../../../../../src/app/content/base/contents.base.template.html"),
+        styles: [__webpack_require__("../../../../../src/app/content/choreographies/choreographies.component.scss")]
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["b" /* HttpClient */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["b" /* HttpClient */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__services_login_service__["a" /* LoginService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__services_login_service__["a" /* LoginService */]) === "function" && _b || Object])
+], ChoreographiesComponent);
+
+var _a, _b;
+//# sourceMappingURL=choreographies.component.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/content/choreography/choreography.component.scss":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
+/***/ "../../../../../src/app/content/choreography/choreography.component.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common_http__ = __webpack_require__("../../../common/@angular/common/http.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_login_service__ = __webpack_require__("../../../../../src/app/services/login.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__ = __webpack_require__("../../../../../src/app/Globals/GlobalObject.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__base_content_base_class__ = __webpack_require__("../../../../../src/app/content/base/content.base.class.ts");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ChoreographyComponent; });
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+
+var ChoreographyComponent = (function (_super) {
+    __extends(ChoreographyComponent, _super);
+    function ChoreographyComponent(route, router, http, loginService) {
+        var _this = _super.call(this, route, router, http, loginService) || this;
+        _this.route = route;
+        _this.router = router;
+        _this.http = http;
+        _this.loginService = loginService;
+        // 'Meta' data
+        _this.contentName = __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__["a" /* GlobalObject */].contentName['choreography'];
+        _this.contentsName = __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__["a" /* GlobalObject */].contentsName['choreography'];
+        _this.texts = __WEBPACK_IMPORTED_MODULE_4__Globals_GlobalObject__["a" /* GlobalObject */].texts['choreography'];
+        return _this;
+    }
+    return ChoreographyComponent;
+}(__WEBPACK_IMPORTED_MODULE_5__base_content_base_class__["a" /* ContentBaseClass */]));
+__decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"])(),
+    __metadata("design:type", String)
+], ChoreographyComponent.prototype, "customStyles", void 0);
+ChoreographyComponent = __decorate([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+        selector: 'choreography',
+        template: __webpack_require__("../../../../../src/app/content/base/content.base.template.html"),
+        styles: [__webpack_require__("../../../../../src/app/content/choreography/choreography.component.scss")]
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* ActivatedRoute */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["b" /* ActivatedRoute */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["c" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["c" /* Router */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["b" /* HttpClient */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["b" /* HttpClient */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_login_service__["a" /* LoginService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_login_service__["a" /* LoginService */]) === "function" && _d || Object])
+], ChoreographyComponent);
+
+var _a, _b, _c, _d;
+//# sourceMappingURL=choreography.component.js.map
 
 /***/ }),
 
@@ -1364,7 +1813,7 @@ SafeHtmlPipe = __decorate([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Pipe"])({
         name: 'safeHtml'
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__["d" /* DomSanitizer */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__["d" /* DomSanitizer */]) === "function" && _a || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__["e" /* DomSanitizer */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__["e" /* DomSanitizer */]) === "function" && _a || Object])
 ], SafeHtmlPipe);
 
 var FormatDateFromBootstrap = (function () {
@@ -1417,30 +1866,43 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var LoginService = (function () {
     function LoginService(http) {
         this.http = http;
-        this.username = 'admin';
-        this.password = null;
+        this.username = null;
+        this.checkLogin();
     }
+    // Стартовая проверка логина
+    LoginService.prototype.checkLogin = function () {
+        var _this = this;
+        this.http.get(__WEBPACK_IMPORTED_MODULE_2__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/api/admin/login').subscribe(function (data) {
+            // Если уже залогинен, то взять имя из ответа
+            data['username'] && (_this.username = data['username']);
+        });
+    };
     LoginService.prototype.login = function (username, password) {
-        // Its only test
+        var _this = this;
         // Here should be a server request
-        if (password == 'admin') {
-            this.username = username;
-            this.password = password;
-            localStorage.setItem('username', username);
-            console.log('[LoginService] Logged in as ' + username);
-        }
+        this.http.post(__WEBPACK_IMPORTED_MODULE_2__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/api/admin/login', { username: username, password: password }).subscribe(function (data) {
+            if (data['state'] === 'success') {
+                _this.username = username;
+                console.log('[LoginService] Logged in as ' + username);
+            }
+            else {
+                alert('Неверный логин или пароль');
+                console.log('[LoginService] Login failed');
+            }
+        });
     };
     LoginService.prototype.logout = function () {
-        this.username = null;
-        this.password = null;
-        console.log('[LoginService] Logged out');
+        var _this = this;
+        this.http.delete(__WEBPACK_IMPORTED_MODULE_2__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/api/admin/login').subscribe(function (data) {
+            _this.username = null;
+            console.log('[LoginService] Logged out');
+        });
     };
     LoginService.prototype.changePassword = function (oldPass, newPass) {
-        var _this = this;
         this.http.post(__WEBPACK_IMPORTED_MODULE_2__Globals_GlobalObject__["a" /* GlobalObject */].serverAddress + '/api/admin/change-password', { oldPass: oldPass, newPass: newPass }).subscribe(function (data) {
             data['message'] && console.log(data['message']);
             if (data['state'] === 'success')
-                _this.password = newPass;
+                alert('Пароль изменён');
         });
         console.log('[LoginService] Changing password...');
     };
